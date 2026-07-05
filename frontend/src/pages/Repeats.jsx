@@ -4,6 +4,7 @@ import { Card } from '../components/ui/Card';
 import { Chip } from '../components/ui/Chip';
 import { NumberBall } from '../components/ui/NumberBall';
 import { Button } from '../components/ui/Button';
+import { PerformanceHistoryRow } from '../components/engine/PerformanceHistoryRow';
 
 const TIER_TONE = { high: 'good', med: 'warn', low: 'default', new: 'default' };
 const TIER_LABEL = { high: 'ÉLEVÉ', med: 'MOYEN', low: 'PEU DE DONNÉES', new: 'NOUVEAU' };
@@ -59,14 +60,15 @@ export function Repeats() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
             {performance.length === 0 && <p style={{ color: 'var(--t3)', fontSize: 12 }}>Pas assez d'historique pour évaluer la performance.</p>}
             {performance.map((r, i) => (
-              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '6px 10px', borderRadius: 6, background: r.hits.length ? 'var(--gnl)' : 'var(--s2)' }}>
-                <span style={{ fontSize: 11, width: 130, color: 'var(--t3)' }}>{r.drawDate?.slice(0, 10)} · {r.drawType === 'lunch' ? 'Lunch' : 'Tea'}</span>
-                <span style={{ fontSize: 11, color: 'var(--t3)' }}>{r.total} prédictions</span>
-                <span style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
-                  {r.hits.map((h) => <NumberBall key={h.num} value={h.num} size={22} tone="v1" />)}
-                  {r.hits.length === 0 && <span style={{ fontSize: 11, color: 'var(--t3)' }}>aucun hit</span>}
-                </span>
-              </div>
+              <PerformanceHistoryRow
+                key={i}
+                date={r.drawDate}
+                type={r.drawType}
+                totalLabel={`${r.total} prédictions`}
+                hits={r.hits}
+                getHitValue={(h) => h.num}
+                ballTone="v1"
+              />
             ))}
           </div>
         )}

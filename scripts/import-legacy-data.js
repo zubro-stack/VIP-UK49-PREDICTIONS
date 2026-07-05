@@ -42,6 +42,8 @@ async function main() {
   const { accessToken } = await loginRes.json();
   const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` };
 
+  let hadFailure = false;
+
   if (exportPayload.draws.length > 0) {
     const importRes = await fetch(`${API_URL}/draws/import`, {
       method: 'POST',
@@ -50,6 +52,7 @@ async function main() {
     });
     if (!importRes.ok) {
       console.error('Draw import failed:', await importRes.text());
+      hadFailure = true;
     } else {
       const result = await importRes.json();
       console.log(`Imported draws: ${result.count} new rows (duplicates on the same date+type were skipped).`);
@@ -63,6 +66,12 @@ async function main() {
     else console.error(`Post "${post.title}" failed:`, await res.text());
   }
   console.log(`Imported posts: ${postsImported}/${exportPayload.posts.length}.`);
+  if (postsImported < exportPayload.posts.length) hadFailure = true;
+
+  if (hadFailure) {
+    console.error('Migration completed with errors - see above.');
+    process.exitCode = 1;
+  }
 }
 
 main().catch((err) => {

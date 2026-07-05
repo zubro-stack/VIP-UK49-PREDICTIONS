@@ -45,6 +45,24 @@ function latestLunchTeaPair(sortedDraws) {
   return lunch && tea ? { lunch, tea } : null;
 }
 
+/**
+ * Groups (already sorted) draws by calendar date, preserving date order.
+ * Returns { dayMap, dayList } - dayMap maps a date string to its draws
+ * (Lunch/Tea, in sorted order), dayList is the ordered list of dates.
+ */
+function groupByDay(sortedDraws) {
+  const dayMap = new Map();
+  const dayList = [];
+  sortedDraws.forEach((d) => {
+    if (!dayMap.has(d.drawDate)) {
+      dayMap.set(d.drawDate, []);
+      dayList.push(d.drawDate);
+    }
+    dayMap.get(d.drawDate).push(d);
+  });
+  return { dayMap, dayList };
+}
+
 module.exports = {
   sortDraws,
   byType,
@@ -54,4 +72,5 @@ module.exports = {
   latestOfType,
   latestTwoOfType,
   latestLunchTeaPair,
+  groupByDay,
 };

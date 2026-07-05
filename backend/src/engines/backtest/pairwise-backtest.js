@@ -2,21 +2,32 @@ const { sortDraws } = require('../core/draw-utils');
 const { containsEquivalent } = require('../core/lottery-math');
 const { pairwiseEngines, pairwiseConfigs } = require('../pairwise');
 
+function targetKey(drawDate, drawType) {
+  return `${drawDate}|${drawType}`;
+}
+
 /**
  * A card's real-world target draw(s) are found the exact same way the
  * engine's own buildUnits() finds them for historical units - so instead
  * of re-deriving "next day" / "same day" rules here, we run buildUnits()
- * over the FULL (untruncated) draw list and pick out the unit whose
- * source anchor matches the card, reading its already-resolved targets.
- * (currentSources always anchors on sourceA, and every config's sourceA
- * carries the pattern's own drawType, or 'lunch' for the cross-type
- * engines - v2, bonus-v2, same-day - so that single rule covers all 7.)
+ * ONCE over the FULL (untruncated) draw list and index every unit by its
+ * source anchor. (currentSources always anchors on sourceA, and every
+ * config's sourceA carries the pattern's own drawType, or 'lunch' for the
+ * cross-type engines - v2, bonus-v2, same-day - so one lookup rule covers
+ * all 7.) Built once per backtest run instead of once per card per
+ * checkpoint, since the full draw list never changes across the replay.
  */
-function resolveCardTargets(config, fullSortedDraws, card) {
+function buildTargetIndex(config, fullSortedDraws) {
+  const index = new Map();
+  config.buildUnits(fullSortedDraws).forEach((unit) => {
+    index.set(targetKey(unit.sourceA.drawDate, unit.sourceA.drawType), unit.targets);
+  });
+  return index;
+}
+
+function resolveCardTargets(targetIndex, card) {
   const anchorType = card.drawType ?? 'lunch';
-  const units = config.buildUnits(fullSortedDraws);
-  const unit = units.find((u) => u.sourceA.drawDate === card.sourceDate && u.sourceA.drawType === anchorType);
-  return unit ? unit.targets : [];
+  return targetIndex.get(targetKey(card.sourceDate, anchorType));
 }
 
 function cardHit(config, card, targets) {
@@ -34,6 +45,15 @@ function cardHit(config, card, targets) {
  * across every checkpoint gives the engine's real historical hit rate -
  * this is what "backtesting" means for the 7 pairwise engines, none of
  * which had any performance-measurement built in before.
+ *
+ * A card whose real outcome isn't resolvable (no matching unit - e.g. the
+ * Same Day engine anchoring on a Lunch draw whose Tea hasn't been entered
+ * yet, or Bonus Family's stricter same-type adjacency at the very end of
+ * the draw list) is excluded from that checkpoint's tally entirely rather
+ * than counted as a guaranteed miss - otherwise every trailing checkpoint
+ * (exactly the ones a user reviewing a backtest looks at first) would have
+ * its hit rate artificially deflated by outcomes that simply aren't known
+ * yet.
  */
 function runPairwiseBacktest(engineCode, draws, { minHistory = 6, limit = 60 } = {}) {
   const engine = pairwiseEngines[engineCode];
@@ -41,6 +61,7 @@ function runPairwiseBacktest(engineCode, draws, { minHistory = 6, limit = 60 } =
   if (!engine || !config) throw new Error(`Unknown pairwise engine "${engineCode}"`);
 
   const sorted = sortDraws(draws);
+  const targetIndex = buildTargetIndex(config, sorted);
   const checkpoints = [];
 
   for (let i = minHistory; i < sorted.length; i++) {
@@ -50,17 +71,21 @@ function runPairwiseBacktest(engineCode, draws, { minHistory = 6, limit = 60 } =
     if (!cards.length) continue;
 
     let hits = 0;
+    let resolvedCount = 0;
     cards.forEach((card) => {
-      const targets = resolveCardTargets(config, sorted, card);
+      const targets = resolveCardTargets(targetIndex, card);
+      if (!targets) return; // outcome not yet known - excluded, not a miss
+      resolvedCount++;
       if (targets.length && cardHit(config, card, targets)) hits++;
     });
+    if (!resolvedCount) continue;
 
     checkpoints.push({
       asOfDate: sorted[i].drawDate,
       asOfType: sorted[i].drawType,
-      predictionsCount: cards.length,
+      predictionsCount: resolvedCount,
       hits,
-      hitRate: cards.length ? hits / cards.length : null,
+      hitRate: hits / resolvedCount,
     });
   }
 

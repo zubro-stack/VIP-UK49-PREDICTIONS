@@ -5,9 +5,18 @@ import { Chip } from '../components/ui/Chip';
 import { NumberBall } from '../components/ui/NumberBall';
 import { Button } from '../components/ui/Button';
 import { StatTile } from '../components/ui/StatTile';
+import { PerformanceHistoryRow } from '../components/engine/PerformanceHistoryRow';
 
 const TIER_TONE = { 1: 'good', 2: 'warn', 3: 'default' };
 const TIER_LABEL = { 1: '3+ HITS', 2: '2 HITS', 3: '1 HIT' };
+function PerformanceSummaryLine({ row }) {
+  return (
+    <div style={{ fontSize: 11, color: row.hits.length ? 'var(--gnd)' : 'var(--t3)' }}>
+      {row.drawDate?.slice(0, 10)} · {row.drawType} — {row.hits.length}/{row.total} hits
+    </div>
+  );
+}
+
 const TABS = [
   { key: 'hot', label: 'Numéros chauds' },
   { key: 'zones', label: 'Analyse de zone' },
@@ -103,14 +112,14 @@ export function V3() {
             {showHotHistory && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
                 {hotNumbersPerformance.map((r, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '6px 10px', borderRadius: 6, background: r.hasHits ? 'var(--gnl)' : 'var(--s2)' }}>
-                    <span style={{ fontSize: 11, width: 130, color: 'var(--t3)' }}>{r.drawDate?.slice(0, 10)} · {r.drawType === 'lunch' ? 'Lunch' : 'Tea'}</span>
-                    <span style={{ fontSize: 11, color: 'var(--t3)' }}>{r.totalHot} chauds</span>
-                    <span style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
-                      {r.hits.map((n) => <NumberBall key={n} value={n} size={20} tone="v3" />)}
-                      {r.hits.length === 0 && <span style={{ fontSize: 11, color: 'var(--t3)' }}>aucun hit</span>}
-                    </span>
-                  </div>
+                  <PerformanceHistoryRow
+                    key={i}
+                    date={r.drawDate}
+                    type={r.drawType}
+                    totalLabel={`${r.totalHot} chauds`}
+                    hits={r.hits}
+                    ballTone="v3"
+                  />
                 ))}
               </div>
             )}
@@ -159,19 +168,11 @@ export function V3() {
               <div style={{ marginTop: 12 }}>
                 <div style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 6 }}>Paires ({pairsTripletsPerformance.pairRows.length})</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 14 }}>
-                  {pairsTripletsPerformance.pairRows.map((r, i) => (
-                    <div key={i} style={{ fontSize: 11, color: r.hits.length ? 'var(--gnd)' : 'var(--t3)' }}>
-                      {r.drawDate?.slice(0, 10)} · {r.drawType} — {r.hits.length}/{r.total} hits
-                    </div>
-                  ))}
+                  {pairsTripletsPerformance.pairRows.map((r, i) => <PerformanceSummaryLine key={i} row={r} />)}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 6 }}>Triplets ({pairsTripletsPerformance.tripletRows.length})</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {pairsTripletsPerformance.tripletRows.map((r, i) => (
-                    <div key={i} style={{ fontSize: 11, color: r.hits.length ? 'var(--gnd)' : 'var(--t3)' }}>
-                      {r.drawDate?.slice(0, 10)} · {r.drawType} — {r.hits.length}/{r.total} hits
-                    </div>
-                  ))}
+                  {pairsTripletsPerformance.tripletRows.map((r, i) => <PerformanceSummaryLine key={i} row={r} />)}
                 </div>
               </div>
             )}

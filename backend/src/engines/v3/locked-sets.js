@@ -1,5 +1,5 @@
 const { NUMBER_GROUPS } = require('./chart');
-const { sortDraws } = require('../core/draw-utils');
+const { sortDraws, groupByDay } = require('../core/draw-utils');
 const { drawValues } = require('../core/lottery-math');
 
 function buildSetAt(sortedDraws, asOfIdx, window) {
@@ -64,15 +64,7 @@ function computePairsTripletsPerformance(draws, limit = 30) {
 
   const pairRows = [];
   const tripletRows = [];
-  const dayMap = new Map();
-  const dayList = [];
-  sorted.forEach((d) => {
-    if (!dayMap.has(d.drawDate)) {
-      dayMap.set(d.drawDate, []);
-      dayList.push(d.drawDate);
-    }
-    dayMap.get(d.drawDate).push(d);
-  });
+  const { dayMap, dayList } = groupByDay(sorted);
 
   function scoreAgainst(lockedPairs, lockedTriplets, targetDraws, lockedFromLabel) {
     targetDraws.forEach((draw) => {

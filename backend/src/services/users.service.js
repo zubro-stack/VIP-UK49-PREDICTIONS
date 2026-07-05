@@ -19,17 +19,26 @@ async function create({ email, password, displayName, role }) {
   return sanitize(user);
 }
 
-async function update(id, data) {
+async function update(id, data, actor) {
+  if (actor.id === id && data.isActive === false) {
+    throw AppError.forbidden('You cannot deactivate your own account');
+  }
   const user = await usersRepository.update(id, data);
   return sanitize(user);
 }
 
-async function updateRole(id, role) {
+async function updateRole(id, role, actor) {
+  if (actor.id === id) {
+    throw AppError.forbidden('You cannot change your own role');
+  }
   const user = await usersRepository.updateRole(id, role);
   return sanitize(user);
 }
 
-async function remove(id) {
+async function remove(id, actor) {
+  if (actor.id === id) {
+    throw AppError.forbidden('You cannot delete your own account');
+  }
   await usersRepository.remove(id);
 }
 

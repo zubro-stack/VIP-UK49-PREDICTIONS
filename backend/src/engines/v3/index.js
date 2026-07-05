@@ -33,10 +33,13 @@ function computeV3Analysis(draws) {
   const zoneAnalysis = analyzeZones(sorted);
   const remainders = computeRemainders(sorted);
   const pairsTripletsPerformance = computePairsTripletsPerformance(sorted);
-  const hotNumbers = computeHotNumbers(sorted);
+  // Computed once and shared: computeHotNumbers and computeCommonNumbers both
+  // need the same v1-seq/v1-fam/v2 cross-reference, which is itself a full
+  // discover()+buildCards() pass per engine - not worth running twice.
+  const crossEnginePredictions = collectCrossEnginePredictions(sorted);
+  const hotNumbers = computeHotNumbers(sorted, crossEnginePredictions);
   const hotNumbersPerformance = computeHotNumbersPerformance(sorted);
   const chartPredictions = computeChartPredictions(hotNumbers);
-  const crossEnginePredictions = collectCrossEnginePredictions(sorted);
   const commonNumbers = computeCommonNumbers(crossEnginePredictions);
 
   const activeSet = new Set();

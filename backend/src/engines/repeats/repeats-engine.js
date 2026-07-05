@@ -24,8 +24,13 @@ function computeRepeats(draws, windowSize = DEFAULT_WINDOW) {
   if (n < 3) return { predictions: [], history: {}, windowSize: n };
 
   const sets = window.map((d) => new Set(d.nums));
-  const allNums = new Set();
-  sets.forEach((s) => s.forEach((x) => allNums.add(x)));
+  const allNumsSet = new Set();
+  sets.forEach((s) => s.forEach((x) => allNumsSet.add(x)));
+  // Ascending numeric order, matching the legacy plain-object key iteration
+  // (integer-like object keys iterate ascending) - keeps tie-broken
+  // predictions (equal tier/rate/total) in a stable, predictable order
+  // instead of draw-insertion order.
+  const allNums = [...allNumsSet].sort((a, b) => a - b);
 
   const history = {};
   let predictions = [];

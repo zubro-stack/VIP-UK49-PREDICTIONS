@@ -1,4 +1,4 @@
-const { sortDraws } = require('../core/draw-utils');
+const { sortDraws, groupByDay } = require('../core/draw-utils');
 const { drawValues } = require('../core/lottery-math');
 const { analyzeZones } = require('./zone-analysis');
 const { collectCrossEnginePredictions } = require('./cross-engine-predictions');
@@ -7,10 +7,15 @@ const { collectCrossEnginePredictions } = require('./cross-engine-predictions');
  * "Hot" numbers are zone-analysis tier-1/tier-2 predictions that are ALSO
  * independently predicted by at least one pairwise engine (V1 Seq, V1 Fam,
  * or V2) - cross-engine agreement is the confirmation signal.
+ *
+ * `crossEnginePredictions` can be passed in when the caller already
+ * computed it (computeV3Analysis needs the same result for
+ * computeCommonNumbers too) to avoid re-running discover()+buildCards()
+ * for v1-seq/v1-fam/v2 a second time.
  */
-function computeHotNumbers(draws) {
+function computeHotNumbers(draws, crossEnginePredictions) {
   const zones = analyzeZones(draws);
-  const preds = collectCrossEnginePredictions(draws);
+  const preds = crossEnginePredictions ?? collectCrossEnginePredictions(draws);
   const tier1 = (zones.tiers[1] || []).map((p) => p.num);
   const tier2 = (zones.tiers[2] || []).map((p) => p.num);
 
@@ -47,15 +52,7 @@ function computeHotNumbersPerformance(draws, limit = 30) {
   const sorted = sortDraws(draws);
   if (sorted.length < 5) return [];
 
-  const dayMap = new Map();
-  const dayList = [];
-  sorted.forEach((d) => {
-    if (!dayMap.has(d.drawDate)) {
-      dayMap.set(d.drawDate, []);
-      dayList.push(d.drawDate);
-    }
-    dayMap.get(d.drawDate).push(d);
-  });
+  const { dayMap, dayList } = groupByDay(sorted);
 
   const results = [];
   for (let di = 1; di < dayList.length; di++) {
