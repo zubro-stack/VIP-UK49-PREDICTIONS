@@ -9,5 +9,7 @@ router.use('/engines', require('./engines.routes'));
 router.use('/repeats', require('./repeats.routes'));
 router.use('/v3', require('./v3.routes'));
 router.use('/backtests', require('./backtests.routes'));
+router.use('/best-pairs', require('./best-pairs.routes'));
+router.use('/posts', require('./posts.routes'));
 
 module.exports = router;

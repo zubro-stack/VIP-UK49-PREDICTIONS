@@ -8,7 +8,10 @@ import { EnginePage } from '../pages/engines/EnginePage';
 import { Repeats } from '../pages/Repeats';
 import { V3 } from '../pages/V3';
 import { Backtesting } from '../pages/Backtesting';
-import { ComingSoon } from '../pages/ComingSoon';
+import { BestPairs } from '../pages/BestPairs';
+import { Posts } from '../pages/Posts';
+import { FAQ } from '../pages/FAQ';
+import { AdminUsers } from '../pages/admin/Users';
 import { PAIRWISE_ENGINE_NAV } from './engineNav';
 
 const engineRoutes = PAIRWISE_ENGINE_NAV.map((e) => ({
@@ -38,7 +41,7 @@ export const router = createBrowserRouter([
       ...engineRoutes,
       { path: 'engines/v3', element: <V3 /> },
       { path: 'repeats', element: <Repeats /> },
-      { path: 'best-pairs', element: <ComingSoon title="Combinaisons" /> },
+      { path: 'best-pairs', element: <BestPairs /> },
       {
         path: 'backtesting',
         element: (
@@ -47,13 +50,13 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: 'posts', element: <ComingSoon title="Publications" /> },
-      { path: 'faq', element: <ComingSoon title="FAQ" /> },
+      { path: 'posts', element: <Posts /> },
+      { path: 'faq', element: <FAQ /> },
       {
         path: 'admin/users',
         element: (
           <ProtectedRoute minRole="admin">
-            <ComingSoon title="Utilisateurs" />
+            <AdminUsers />
           </ProtectedRoute>
         ),
       },
