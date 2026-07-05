@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  manager
+  user
+}
+
+enum DrawType {
+  lunch
+  tea
+}
+
+enum DrawSource {
+  manual
+  import
+}
+
+enum PatternStatus {
+  active
+  warning
+  failed
+}
+
+enum BacktestStatus {
+  queued
+  running
+  done
+  failed
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  displayName  String   @map("display_name")
+  role         UserRole @default(user)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  createdDraws Draw[]         @relation("DrawCreatedBy")
+  posts        Post[]
+  backtestRuns BacktestRun[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Draw {
+  id        String     @id @default(uuid())
+  drawDate  DateTime   @map("draw_date") @db.Date
+  drawType  DrawType   @map("draw_type")
+  numbers   Int[]
+  bonus     Int
+  source    DrawSource @default(manual)
+  createdBy String?    @map("created_by")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  creator             User?                @relation("DrawCreatedBy", fields: [createdBy], references: [id])
+  sourceHistoryA      PatternHistory[]      @relation("SourceDraw")
+  targetHistoryA      PatternHistory[]      @relation("TargetDraw")
+  predictionSnapshots PredictionSnapshot[]
+
+  @@unique([drawDate, drawType])
+  @@map("draws")
+}
+
+model EngineDefinition {
+  code     String  @id
+  label    String
+  category String
+  config   Json?
+
+  patterns Pattern[]
+
+  @@map("engine_definitions")
+}
+
+model Pattern {
+  id           String        @id @default(uuid())
+  engineCode   String        @map("engine_code")
+  drawType     DrawType?     @map("draw_type")
+  positionA    Int           @map("position_a")
+  positionB    Int           @map("position_b")
+  extra        Json          @default("{}")
+  status       PatternStatus @default(active)
+  occurrences  Int           @default(0)
+  failures     Int           @default(0)
+  streak       Int           @default(0)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  engine  EngineDefinition  @relation(fields: [engineCode], references: [code])
+  history PatternHistory[]
+
+  @@unique([engineCode, drawType, positionA, positionB])
+  @@index([engineCode, status])
+  @@map("patterns")
+}
+
+model PatternHistory {
+  id            String   @id @default(uuid())
+  patternId     String   @map("pattern_id")
+  sourceDrawId  String   @map("source_draw_id")
+  targetDrawId  String?  @map("target_draw_id")
+  addPreds      Int[]    @map("add_preds")
+  subPreds      Int[]    @map("sub_preds")
+  addHit        Boolean  @map("add_hit")
+  subHit        Boolean  @map("sub_hit")
+  hit           Boolean
+  addDirectHit  Boolean? @map("add_direct_hit")
+  subDirectHit  Boolean? @map("sub_direct_hit")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  pattern    Pattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+  sourceDraw Draw    @relation("SourceDraw", fields: [sourceDrawId], references: [id])
+  targetDraw Draw?   @relation("TargetDraw", fields: [targetDrawId], references: [id])
+
+  @@index([patternId])
+  @@map("pattern_history")
+}
+
+model PredictionSnapshot {
+  id          String   @id @default(uuid())
+  engineCode  String   @map("engine_code")
+  generatedAt DateTime @default(now()) @map("generated_at")
+  asOfDrawId  String?  @map("as_of_draw_id")
+  payload     Json
+
+  asOfDraw Draw? @relation(fields: [asOfDrawId], references: [id])
+
+  @@index([engineCode, generatedAt])
+  @@map("prediction_snapshots")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  authorId  String   @map("author_id")
+  title     String
+  target    String
+  numbers   String
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@map("posts")
+}
+
+model BacktestRun {
+  id           String         @id @default(uuid())
+  engineCode   String         @map("engine_code")
+  requestedBy  String         @map("requested_by")
+  params       Json
+  status       BacktestStatus @default(queued)
+  createdAt    DateTime       @default(now()) @map("created_at")
+  finishedAt   DateTime?      @map("finished_at")
+
+  requester User             @relation(fields: [requestedBy], references: [id])
+  results   BacktestResult[]
+
+  @@map("backtest_runs")
+}
+
+model BacktestResult {
+  id          String @id @default(uuid())
+  runId       String @map("run_id")
+  metricName  String @map("metric_name")
+  metricValue Float  @map("metric_value")
+  breakdown   Json   @default("{}")
+
+  run BacktestRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@map("backtest_results")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String   @map("actor_id")
+  action    String
+  entity    String
+  entityId  String   @map("entity_id")
+  meta      Json      @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@map("audit_logs")
+}
