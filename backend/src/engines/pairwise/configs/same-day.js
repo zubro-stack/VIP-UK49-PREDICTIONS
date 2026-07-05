@@ -1,3 +1,4 @@
+const { latestOfType } = require('../../core/draw-utils');
 const { ALL_PAIRS_UNORDERED } = require('./position-spaces');
 
 /**
@@ -28,7 +29,7 @@ const sameDayConfig = {
   keyFn: (unit, i, j) => `sd|${i}|${j}`,
 
   currentSources(sorted) {
-    const latestLunch = sorted.slice().reverse().find((d) => d.drawType === 'lunch');
+    const latestLunch = latestOfType(sorted, 'lunch');
     return latestLunch ? { sourceA: latestLunch, sourceB: latestLunch } : null;
   },
 };

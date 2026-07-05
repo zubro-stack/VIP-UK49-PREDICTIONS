@@ -1,4 +1,4 @@
-const { byType, findNextDayTargets } = require('../../core/draw-utils');
+const { byType, findNextDayTargets, latestTwoOfType } = require('../../core/draw-utils');
 const { ALL_PAIRS } = require('./position-spaces');
 
 /**
@@ -30,9 +30,8 @@ const v1FamilyConfig = {
   keyFn: (unit, i, j) => `fam|${unit.drawType}|${i}|${j}`,
 
   currentSources(sorted, pattern) {
-    const typed = byType(sorted, pattern.drawType).slice().reverse();
-    if (typed.length < 2) return null;
-    return { sourceA: typed[0], sourceB: typed[1] };
+    const pair = latestTwoOfType(sorted, pattern.drawType);
+    return pair ? { sourceA: pair[0], sourceB: pair[1] } : null;
   },
 };
 

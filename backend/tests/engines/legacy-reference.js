@@ -251,7 +251,42 @@ function discoverBonusV2(draws) {
   return finalizeBonus(map);
 }
 
+function cW(h) { let n = 0; for (let i = h.length - 1; i >= 0; i--) { if (h[i].hit) n++; else break; } return n; }
+
+function buildSeqCards(draws, pats) {
+  const rev = sortD(draws).slice().reverse();
+  const lL = rev.find((d) => d.drawType === 'lunch');
+  const lT = rev.find((d) => d.drawType === 'tea');
+  if (!lL && !lT) return [];
+  const l10 = new Set(sortD(draws).slice(-SC.MAX_DRAWS).map((d) => d.drawDate));
+  return pats
+    .filter((p) => p.status === 'active' && p.history.filter((x) => x.hit).length >= 2 && p.history.some((x) => l10.has(x.drawDate) && x.hit))
+    .map((pat) => {
+      const src = pat.drawType === 'lunch' ? lL : lT;
+      if (!src) return null;
+      const nums = src.numbers.concat([src.bonus]);
+      const n1 = nums[pat.p1], n2 = nums[pat.p2];
+      const ap = n1 + n2, sp = Math.abs(n1 - n2);
+      const lastHit = pat.history.length > 0 ? !!pat.history[pat.history.length - 1].hit : false;
+      const hasDirectHit = pat.history.some((x) => x.addDirectHit || x.subDirectHit);
+      return {
+        id: pat.id, drawType: pat.drawType, p1: pat.p1, p2: pat.p2, v1: n1, v2: n2, srcDate: src.drawDate,
+        addPred: ap >= 1 && ap <= 49 ? ap : null, subPred: sp >= 1 && sp <= 49 && sp !== 0 ? sp : null,
+        totalHits: pat.history.filter((x) => x.hit).length, streak: cW(pat.history),
+        last5: pat.history.filter((x) => x.hit).slice(-5).reverse(), failures: pat.failures,
+        lastHit, hasDirectHit,
+      };
+    })
+    .filter((c) => c && c.streak >= 2)
+    .sort((a, b) => {
+      if (a.hasDirectHit !== b.hasDirectHit) return a.hasDirectHit ? -1 : 1;
+      if (a.lastHit !== b.lastHit) return a.lastHit ? -1 : 1;
+      return b.streak - a.streak || b.totalHits - a.totalHits;
+    });
+}
+
 module.exports = {
   discoverSeq, discoverFam, discoverV2, discoverSameDay,
   discoverBonusSeq, discoverBonusFam, discoverBonusV2,
+  buildSeqCards,
 };

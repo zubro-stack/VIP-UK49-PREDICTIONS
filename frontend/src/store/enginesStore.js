@@ -20,14 +20,16 @@ export const useEnginesStore = create((set, get) => ({
     try {
       const cards = await enginesApi.getPatterns(code);
       set((s) => ({ byCode: { ...s.byCode, [code]: { cards, status: 'ready' } } }));
+      return cards;
     } catch (err) {
       set((s) => ({ byCode: { ...s.byCode, [code]: { cards: [], status: 'error', error: err.message } } }));
+      return [];
     }
   },
 
   async runEngine(code) {
     await enginesApi.run(code);
-    await get().loadCards(code);
+    return get().loadCards(code);
   },
 
   async recordMiss(code, patternId) {

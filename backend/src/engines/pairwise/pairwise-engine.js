@@ -54,6 +54,15 @@ function discover(draws, config) {
       const addHit = addPreds.some((p) => unit.targets.some((t) => matchTarget(p, t)));
       const subHit = subPreds.some((p) => unit.targets.some((t) => matchTarget(p, t)));
 
+      // Record the target draw that actually matched (if any) rather than
+      // always targets[0] - findNextDayTargets can return more than one
+      // draw (e.g. both Lunch and Tea a day later), and the hit may only
+      // be true against the second one.
+      const matchedTarget =
+        unit.targets.find((t) => addPreds.some((p) => matchTarget(p, t)) || subPreds.some((p) => matchTarget(p, t))) ??
+        unit.targets[0] ??
+        null;
+
       const key = config.keyFn(unit, i, j);
       if (!map.has(key)) {
         map.set(key, {
@@ -68,9 +77,9 @@ function discover(draws, config) {
 
       const entry = {
         sourceDate: unit.sourceA.drawDate,
-        targetDate: unit.targets[0] ? unit.targets[0].drawDate : null,
+        targetDate: matchedTarget ? matchedTarget.drawDate : null,
         sourceDrawId: unit.sourceA.id ?? null,
-        targetDrawId: unit.targets[0] ? unit.targets[0].id ?? null : null,
+        targetDrawId: matchedTarget ? matchedTarget.id ?? null : null,
         v1: n1,
         v2: n2,
         addPreds,
@@ -96,8 +105,17 @@ function buildCards(draws, patterns, config) {
   const diffTransform = config.diffTransform ?? identityTransform;
   const minStreak = config.minHits ?? 2;
 
+  // A pattern only surfaces as a live card if it has hit within the recent
+  // window (the last `maxDraws` draws on record), not merely at some point
+  // in its full history - mirrors the legacy engines' "l10" recency gate.
+  // Matched by draw id (not date string) because persisted PatternHistory
+  // rows only carry sourceDrawId, not a denormalized date.
+  const maxDraws = config.maxDraws ?? DEFAULT_MAX_DRAWS;
+  const recentDrawIds = new Set(sorted.slice(-maxDraws).map((d) => d.id));
+  const hasRecentHit = (pattern) => pattern.history.some((h) => h.hit && recentDrawIds.has(h.sourceDrawId));
+
   return patterns
-    .filter((p) => p.status === 'active' && p.occurrences >= (config.minHits ?? 2))
+    .filter((p) => p.status === 'active' && p.occurrences >= (config.minHits ?? 2) && hasRecentHit(p))
     .map((pattern) => {
       const current = config.currentSources(sorted, pattern);
       if (!current) return null;

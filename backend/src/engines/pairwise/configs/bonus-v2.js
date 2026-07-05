@@ -1,4 +1,4 @@
-const { byType, findNextDayTargets } = require('../../core/draw-utils');
+const { byType, findNextDayTargets, findSameDayTarget, latestLunchTeaPair } = require('../../core/draw-utils');
 const { isEquivalent, bonusDigitShiftTransform } = require('../../core/lottery-math');
 const { ALL_PAIRS } = require('./position-spaces');
 
@@ -16,7 +16,7 @@ const bonusV2Config = {
   buildUnits(sorted) {
     const units = [];
     for (const lunch of byType(sorted, 'lunch')) {
-      const tea = sorted.find((d) => d.drawType === 'tea' && d.drawDate === lunch.drawDate);
+      const tea = findSameDayTarget(sorted, lunch, 'tea');
       if (!tea) continue;
       const targets = findNextDayTargets(sorted, lunch);
       if (targets.length === 0) continue;
@@ -32,11 +32,8 @@ const bonusV2Config = {
   keyFn: (unit, i, j) => `bv2|${i}|${j}`,
 
   currentSources(sorted) {
-    const rev = sorted.slice().reverse();
-    const lunch = rev.find((d) => d.drawType === 'lunch');
-    const tea = rev.find((d) => d.drawType === 'tea');
-    if (!lunch || !tea) return null;
-    return { sourceA: lunch, sourceB: tea };
+    const pair = latestLunchTeaPair(sorted);
+    return pair ? { sourceA: pair.lunch, sourceB: pair.tea } : null;
   },
 };
 

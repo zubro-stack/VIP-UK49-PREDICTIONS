@@ -9,36 +9,41 @@ const { prisma } = require('../config/db');
 async function replaceEngineResults(engineCode, discoveredPatterns) {
   return prisma.$transaction(async (tx) => {
     await tx.pattern.deleteMany({ where: { engineCode } });
-    for (const p of discoveredPatterns) {
-      await tx.pattern.create({
-        data: {
-          engineCode,
-          drawType: p.drawType ?? null,
-          positionA: p.positionA,
-          positionB: p.positionB,
-          extra: p.extra ?? {},
-          status: p.status,
-          occurrences: p.occurrences,
-          failures: p.failures,
-          streak: 0,
-          history: {
-            create: p.history
-              .filter((h) => h.sourceDrawId)
-              .map((h) => ({
-                sourceDrawId: h.sourceDrawId,
-                targetDrawId: h.targetDrawId ?? null,
-                addPreds: h.addPreds,
-                subPreds: h.subPreds,
-                addHit: h.addHit,
-                subHit: h.subHit,
-                hit: h.hit,
-                addDirectHit: h.addDirectHit ?? null,
-                subDirectHit: h.subDirectHit ?? null,
-              })),
+    // Independent creates (one per discovered pattern) - run concurrently
+    // within the transaction instead of one round trip at a time, since a
+    // single engine run can surface dozens of patterns.
+    await Promise.all(
+      discoveredPatterns.map((p) =>
+        tx.pattern.create({
+          data: {
+            engineCode,
+            drawType: p.drawType ?? null,
+            positionA: p.positionA,
+            positionB: p.positionB,
+            extra: p.extra ?? {},
+            status: p.status,
+            occurrences: p.occurrences,
+            failures: p.failures,
+            streak: 0,
+            history: {
+              create: p.history
+                .filter((h) => h.sourceDrawId)
+                .map((h) => ({
+                  sourceDrawId: h.sourceDrawId,
+                  targetDrawId: h.targetDrawId ?? null,
+                  addPreds: h.addPreds,
+                  subPreds: h.subPreds,
+                  addHit: h.addHit,
+                  subHit: h.subHit,
+                  hit: h.hit,
+                  addDirectHit: h.addDirectHit ?? null,
+                  subDirectHit: h.subDirectHit ?? null,
+                })),
+            },
           },
-        },
-      });
-    }
+        })
+      )
+    );
     return tx.pattern.findMany({ where: { engineCode }, include: { history: true } });
   });
 }

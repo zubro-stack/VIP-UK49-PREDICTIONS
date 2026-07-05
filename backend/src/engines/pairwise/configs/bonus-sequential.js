@@ -1,4 +1,4 @@
-const { findNextDayTargets } = require('../../core/draw-utils');
+const { findNextDayTargets, latestOfType } = require('../../core/draw-utils');
 const { isEquivalent, bonusDigitShiftTransform } = require('../../core/lottery-math');
 const { SEQUENTIAL_PAIRS } = require('./position-spaces');
 
@@ -33,7 +33,7 @@ const bonusSequentialConfig = {
   keyFn: (unit, i, j) => `${unit.drawType}|bseq|${i}|${j}`,
 
   currentSources(sorted, pattern) {
-    const latest = sorted.slice().reverse().find((d) => d.drawType === pattern.drawType);
+    const latest = latestOfType(sorted, pattern.drawType);
     return latest ? { sourceA: latest, sourceB: latest } : null;
   },
 };

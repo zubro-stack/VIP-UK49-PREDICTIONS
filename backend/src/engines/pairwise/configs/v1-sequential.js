@@ -1,4 +1,4 @@
-const { findNextDayTargets } = require('../../core/draw-utils');
+const { findNextDayTargets, latestOfType } = require('../../core/draw-utils');
 const { SEQUENTIAL_PAIRS } = require('./position-spaces');
 
 /**
@@ -26,7 +26,7 @@ const v1SequentialConfig = {
   keyFn: (unit, i, j) => `${unit.drawType}|${i}|${j}`,
 
   currentSources(sorted, pattern) {
-    const latest = sorted.slice().reverse().find((d) => d.drawType === pattern.drawType);
+    const latest = latestOfType(sorted, pattern.drawType);
     return latest ? { sourceA: latest, sourceB: latest } : null;
   },
 };

@@ -1,4 +1,4 @@
-const { byType } = require('../../core/draw-utils');
+const { byType, latestTwoOfType } = require('../../core/draw-utils');
 const { isEquivalent, bonusDigitShiftTransform } = require('../../core/lottery-math');
 const { ALL_PAIRS } = require('./position-spaces');
 
@@ -38,9 +38,8 @@ const bonusFamilyConfig = {
   keyFn: (unit, i, j) => `bfam|${unit.drawType}|${i}|${j}`,
 
   currentSources(sorted, pattern) {
-    const typed = byType(sorted, pattern.drawType).slice().reverse();
-    if (typed.length < 2) return null;
-    return { sourceA: typed[0], sourceB: typed[1] };
+    const pair = latestTwoOfType(sorted, pattern.drawType);
+    return pair ? { sourceA: pair[0], sourceB: pair[1] } : null;
   },
 };
 

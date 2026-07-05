@@ -34,7 +34,7 @@ function generateDraws(days = 24, seed = 42) {
       const numbers = drawNumbers(rand);
       const remaining = Array.from({ length: 49 }, (_, i) => i + 1).filter((n) => !numbers.includes(n));
       const bonus = remaining[Math.floor(rand() * remaining.length)];
-      draws.push({ drawDate: date, drawType, numbers, bonus });
+      draws.push({ id: `${date}-${drawType}`, drawDate: date, drawType, numbers, bonus });
     }
   }
   return draws;

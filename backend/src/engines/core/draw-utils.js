@@ -26,10 +26,32 @@ function findSameDayTarget(sortedDraws, anchorDraw, targetType) {
   return sortedDraws.find((d) => d.drawType === targetType && d.drawDate === anchorDraw.drawDate) || null;
 }
 
+/** The most recent draw of a given type, or null if none exists yet. */
+function latestOfType(sortedDraws, drawType) {
+  return sortedDraws.slice().reverse().find((d) => d.drawType === drawType) || null;
+}
+
+/** The two most recent draws of a given type as [mostRecent, previous], or null if fewer than 2 exist. */
+function latestTwoOfType(sortedDraws, drawType) {
+  const typed = byType(sortedDraws, drawType).slice().reverse();
+  return typed.length >= 2 ? [typed[0], typed[1]] : null;
+}
+
+/** The most recent same-day Lunch+Tea pair, or null if either is missing. */
+function latestLunchTeaPair(sortedDraws) {
+  const rev = sortedDraws.slice().reverse();
+  const lunch = rev.find((d) => d.drawType === 'lunch');
+  const tea = rev.find((d) => d.drawType === 'tea');
+  return lunch && tea ? { lunch, tea } : null;
+}
+
 module.exports = {
   sortDraws,
   byType,
   daysBetween,
   findNextDayTargets,
   findSameDayTarget,
+  latestOfType,
+  latestTwoOfType,
+  latestLunchTeaPair,
 };

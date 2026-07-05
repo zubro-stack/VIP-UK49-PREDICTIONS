@@ -16,8 +16,8 @@ export function EnginePage({ code, label }) {
 
   async function handleRun() {
     try {
-      await run();
-      showToast(`${label} recalculé — ${cards.length} prédictions actives`);
+      const freshCards = await run();
+      showToast(`${label} recalculé — ${freshCards.length} prédictions actives`);
     } catch (err) {
       showToast(err.message || 'Échec du calcul', true);
     }
