@@ -9,6 +9,7 @@ import { Repeats } from '../pages/Repeats';
 import { V3 } from '../pages/V3';
 import { Backtesting } from '../pages/Backtesting';
 import { BestPairs } from '../pages/BestPairs';
+import { Calc } from '../pages/Calc';
 import { Posts } from '../pages/Posts';
 import { FAQ } from '../pages/FAQ';
 import { AdminUsers } from '../pages/admin/Users';
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
       { path: 'engines/v3', element: <V3 /> },
       { path: 'repeats', element: <Repeats /> },
       { path: 'best-pairs', element: <BestPairs /> },
+      { path: 'calc', element: <Calc /> },
       {
         path: 'backtesting',
         element: (

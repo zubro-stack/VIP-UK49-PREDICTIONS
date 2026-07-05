@@ -26,6 +26,9 @@ const ENGINE_CATALOG = {
   // served by its own routes (/api/repeats/*) rather than /api/engines/:code
   // - `implemented` is set explicitly since `engine` is intentionally null here.
   repeats: { label: 'Repeats Tracker', category: 'tool', engine: null, implemented: true },
+  // Calc (strat1/strat2/strat3 position-transform predictor + tracker)
+  // has its own routes (/api/calc/*) for the same reason as Repeats/V3.
+  calc: { label: 'Calculator', category: 'tool', engine: null, implemented: true },
 };
 
 module.exports = { ENGINE_CATALOG };

@@ -50,6 +50,7 @@ export function Layout() {
 
         <NavSection title="Outils">
           <NavLink to="/best-pairs" style={linkStyle}>Combinaisons</NavLink>
+          <NavLink to="/calc" style={linkStyle}>Calculateur</NavLink>
           {isManager && <NavLink to="/backtesting" style={linkStyle}>Backtesting</NavLink>}
           <NavLink to="/posts" style={linkStyle}>Publications</NavLink>
           <NavLink to="/faq" style={linkStyle}>FAQ</NavLink>

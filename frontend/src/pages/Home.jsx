@@ -1,8 +1,37 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useEnginesStore } from '../store/enginesStore';
+import { dailyTripletApi } from '../services/api/dailyTripletApi';
 import { Card } from '../components/ui/Card';
 import { Chip } from '../components/ui/Chip';
+import { NumberBall } from '../components/ui/NumberBall';
+
+function DailyTripletCard() {
+  const [triplet, setTriplet] = useState(null);
+
+  useEffect(() => {
+    dailyTripletApi.get().then(setTriplet).catch(() => setTriplet(null));
+  }, []);
+
+  if (!triplet) return null;
+
+  return (
+    <Card style={{ marginBottom: 20, borderTop: '3px solid var(--v3)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: 13 }}>Votre triplet du jour</div>
+          <div style={{ fontSize: 11, color: 'var(--t3)' }}>{triplet.date}</div>
+        </div>
+        {triplet.sharingCount > 1 && <Chip tone="warn">{triplet.sharingCount} comptes partagent ce triplet</Chip>}
+      </div>
+      <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
+        {triplet.triplet.map((n) => (
+          <NumberBall key={n} value={n} size={56} tone="v3" />
+        ))}
+      </div>
+    </Card>
+  );
+}
 
 export function Home() {
   const { user } = useAuth();
@@ -19,6 +48,9 @@ export function Home() {
       <p style={{ color: 'var(--t2)', marginBottom: 24 }}>
         Choisissez un moteur d'analyse dans le menu pour consulter ses prédictions actives.
       </p>
+
+      <DailyTripletCard />
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
         {catalog.map((e) => (
           <Card key={e.code}>

@@ -681,6 +681,116 @@ function hitsHist(srt) {
   return results.slice().reverse().slice(0, 30);
 }
 
+function strat1(nums) {
+  return nums.map((n, i) => {
+    let v = n * 2;
+    if (v > 49) v -= 50;
+    if (v > 49) v -= 50;
+    v += i;
+    if (v > 49) v -= 50;
+    if (v > 49) v -= 50;
+    if (v < 1) v += 50;
+    if (v > 49) return null;
+    return v;
+  });
+}
+function strat2(nums) {
+  return nums.map((n) => { let v = n - 5; if (v < 1) v += 50; if (v > 49) return null; return v; });
+}
+function strat3(bonus) {
+  let f;
+  if (bonus <= 9) { f = bonus; }
+  else { const s = Math.floor(bonus / 10) + (bonus % 10); f = s >= 10 ? s - 8 : s; }
+  const seq = [];
+  for (let v = f; v <= 49; v += 8) seq.push(v);
+  return seq;
+}
+function hitType(num, same, other) {
+  if (same && same.indexOf(num) !== -1) return 'same';
+  if (other && other.indexOf(num) !== -1) return 'other';
+  if ((!same || !same.length) && (!other || !other.length)) return 'none';
+  return 'miss';
+}
+
+function computeTrackerStats(allDraws) {
+  if (!allDraws.length) return null;
+  const dateSet = {};
+  allDraws.forEach((d) => { dateSet[d.drawDate] = true; });
+  const dates = Object.keys(dateSet).sort().slice(-10);
+  const mk = (n) => ({ analyzed: 0, multi2: 0, multi3: 0, totalHits: 0, posHits: new Array(n).fill(0), posTried: new Array(n).fill(0), history: [] });
+  const acc = { s1l: mk(6), s1t: mk(6), s2l: mk(6), s2t: mk(6), s3l: mk(6), s3t: mk(6) };
+
+  dates.forEach((date, di) => {
+    const nextDate = dates[di + 1] || null;
+    if (!nextDate) return;
+    const lunch = allDraws.find((d) => d.drawDate === date && d.drawType === 'lunch') || null;
+    const tea = allDraws.find((d) => d.drawDate === date && d.drawType === 'tea') || null;
+    const nL = allDraws.find((d) => d.drawDate === nextDate && d.drawType === 'lunch') || null;
+    const nT = allDraws.find((d) => d.drawDate === nextDate && d.drawType === 'tea') || null;
+    if (!nL && !nT) return;
+    const nLN = nL ? nL.numbers.concat([nL.bonus]) : [];
+    const nTN = nT ? nT.numbers.concat([nT.bonus]) : [];
+
+    function check(srcNums, srcBonus, acS1, acS2, acS3, targetNums) {
+      if (!srcNums) return;
+      const s1 = strat1(srcNums), s2 = strat2(srcNums), s3 = strat3(srcBonus);
+      acS1.analyzed++;
+      let s1hits = 0; const s1posH = [];
+      s1.forEach((n, i) => { acS1.posTried[i]++; const hit = targetNums.indexOf(n) !== -1; s1posH.push(hit); if (hit) { acS1.posHits[i]++; acS1.totalHits++; s1hits++; } });
+      if (s1hits >= 2) acS1.multi2++;
+      if (s1hits >= 3) acS1.multi3++;
+      acS1.history.push({ hits: s1hits, posH: s1posH });
+
+      acS2.analyzed++;
+      let s2hits = 0; const s2posH = [];
+      s2.forEach((n, i) => { acS2.posTried[i]++; const hit = targetNums.indexOf(n) !== -1; s2posH.push(hit); if (hit) { acS2.posHits[i]++; acS2.totalHits++; s2hits++; } });
+      if (s2hits >= 2) acS2.multi2++;
+      if (s2hits >= 3) acS2.multi3++;
+      acS2.history.push({ hits: s2hits, posH: s2posH });
+
+      if (srcBonus != null) {
+        acS3.analyzed++;
+        let s3hits = 0; const s3posH = [];
+        s3.forEach((n, i) => {
+          if (i > 5) return;
+          acS3.posTried[i]++;
+          const hit = n !== null && targetNums.indexOf(n) !== -1;
+          s3posH.push(hit);
+          if (hit) { acS3.posHits[i]++; acS3.totalHits++; s3hits++; }
+        });
+        if (s3hits >= 2) acS3.multi2++;
+        if (s3hits >= 3) acS3.multi3++;
+        acS3.history.push({ hits: s3hits, posH: s3posH });
+      }
+    }
+
+    if (lunch) check(lunch.numbers, lunch.bonus, acc.s1l, acc.s2l, acc.s3l, nLN);
+    if (tea) check(tea.numbers, tea.bonus, acc.s1t, acc.s2t, acc.s3t, nTN);
+  });
+
+  return acc;
+}
+
+const TTOTAL = 18424, TN = 49, TR = 3;
+function binomial(n, k) {
+  if (k < 0 || k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  let r = 1;
+  for (let i = 0; i < k; i++) r = (r * (n - i)) / (i + 1);
+  return Math.round(r);
+}
+function unrank(idx) {
+  const combo = []; let rem = idx, start = 1;
+  for (let i = TR; i >= 1; i--) {
+    for (let v = start; v <= TN - i + 1; v++) {
+      const cnt = binomial(TN - v, i - 1);
+      if (rem < cnt) { combo.push(v); start = v + 1; break; }
+      rem -= cnt;
+    }
+  }
+  return combo;
+}
+
 module.exports = {
   discoverSeq, discoverFam, discoverV2, discoverSameDay,
   discoverBonusSeq, discoverBonusFam, discoverBonusV2,
@@ -688,4 +798,6 @@ module.exports = {
   normalizeForRepeats, computeRepeats,
   zA, getHotNums, hotMemo, chartPredsFromHot, commonNumsFromPreds,
   remaindersCompute, buildLockedSets, ptHist, hitsHist,
+  strat1, strat2, strat3, hitType, computeTrackerStats,
+  binomial, unrank, TTOTAL,
 };

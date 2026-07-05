@@ -43,6 +43,11 @@ model User {
   displayName  String   @map("display_name")
   role         UserRole @default(user)
   isActive     Boolean  @default(true) @map("is_active")
+  // Permanent, sequential slot assigned at signup - drives the Daily
+  // Triplet feature (see engines/daily-triplet): rotated by a shared daily
+  // offset and wrapped into the 3-number combination space so a user's
+  // triplet changes every day but is deterministic and repeatable.
+  dailySlot    Int      @unique @default(autoincrement()) @map("daily_slot")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
