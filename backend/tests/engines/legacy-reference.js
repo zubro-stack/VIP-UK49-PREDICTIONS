@@ -285,8 +285,77 @@ function buildSeqCards(draws, pats) {
     });
 }
 
+const RW = 10;
+
+function normalizeForRepeats(arr) {
+  return arr.map((d) => {
+    const nums = (d.numbers || []).slice();
+    if (d.bonus != null && nums.indexOf(d.bonus) === -1) nums.push(d.bonus);
+    return { nums, drawDate: d.drawDate, drawType: d.drawType };
+  });
+}
+
+function computeRepeats(draws) {
+  if (!draws || draws.length < 3) return { predictions: [], history: {} };
+  const window = draws.slice(-RW);
+  const n = window.length;
+  if (n < 3) return { predictions: [], history: {} };
+  const sets = window.map((d) => { const s = {}; const nums = d.nums || d.numbers || []; nums.forEach((x) => { s[x] = 1; }); return s; });
+  const allNums = {};
+  sets.forEach((s) => Object.keys(s).forEach((k) => { allNums[k] = 1; }));
+  const numsList = Object.keys(allNums).map(Number);
+  const history = {};
+  let predictions = [];
+  numsList.forEach((num) => {
+    const completed = [];
+    let i = 0;
+    while (i <= n - 3) {
+      if (!sets[i][num]) { i++; continue; }
+      const A = i, B = i + 1, C = i + 2, D = i + 3;
+      const hitB = !!sets[B][num];
+      const hitC = !!sets[C][num];
+      let pattern = null;
+      if (!hitB && hitC) pattern = 'A';
+      else if (hitB && !hitC) pattern = 'B';
+      if (pattern) {
+        if (D < n) {
+          completed.push({ hitD: !!sets[D][num], pattern });
+          i = D + 1;
+          continue;
+        } else {
+          predictions.push({ num, pattern, aIdx: A, bIdx: B, cIdx: C });
+          i = n;
+          break;
+        }
+      }
+      i++;
+    }
+    history[num] = completed;
+  });
+  predictions = predictions.map((p) => {
+    const hArr = history[p.num] || [];
+    const total = hArr.length;
+    let hits = 0;
+    hArr.forEach((x) => { if (x.hitD) hits++; });
+    const rate = total > 0 ? hits / total : null;
+    let tier = 'new';
+    if (total >= 2 && rate >= 0.6) tier = 'high';
+    else if (total >= 1 && rate != null && rate >= 0.33) tier = 'med';
+    else if (total >= 1) tier = 'low';
+    return { ...p, hits, total, rate, tier };
+  });
+  const tierRank = { high: 0, med: 1, low: 2, new: 3 };
+  predictions.sort((a, b) => {
+    if (tierRank[a.tier] !== tierRank[b.tier]) return tierRank[a.tier] - tierRank[b.tier];
+    if (a.rate != null && b.rate != null && a.rate !== b.rate) return b.rate - a.rate;
+    return b.total - a.total;
+  });
+  return { predictions, history, windowSize: n };
+}
+
 module.exports = {
   discoverSeq, discoverFam, discoverV2, discoverSameDay,
   discoverBonusSeq, discoverBonusFam, discoverBonusV2,
   buildSeqCards,
+  normalizeForRepeats, computeRepeats,
 };

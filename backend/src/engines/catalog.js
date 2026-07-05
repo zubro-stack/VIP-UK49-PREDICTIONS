@@ -18,7 +18,11 @@ const ENGINE_CATALOG = {
   'bonus-fam': { label: 'Bonus Family', category: 'pairwise', engine: pairwiseEngines['bonus-fam'] },
   'bonus-v2': { label: 'Bonus V2', category: 'pairwise', engine: pairwiseEngines['bonus-v2'] },
   v3: { label: 'V3 Locked Sets', category: 'triplet', engine: null },
-  repeats: { label: 'Repeats Tracker', category: 'tool', engine: null },
+  // Repeats doesn't fit the generic pairwise discover/buildCards shape (it's
+  // a stateless live computation, not a persisted pattern set) so it's
+  // served by its own routes (/api/repeats/*) rather than /api/engines/:code
+  // - `implemented` is set explicitly since `engine` is intentionally null here.
+  repeats: { label: 'Repeats Tracker', category: 'tool', engine: null, implemented: true },
 };
 
 module.exports = { ENGINE_CATALOG };

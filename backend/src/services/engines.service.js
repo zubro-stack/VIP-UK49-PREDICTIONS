@@ -10,7 +10,7 @@ function getCatalog() {
     code,
     label: meta.label,
     category: meta.category,
-    implemented: Boolean(meta.engine),
+    implemented: meta.implemented ?? Boolean(meta.engine),
   }));
 }
 
