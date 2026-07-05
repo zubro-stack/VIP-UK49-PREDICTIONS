@@ -17,7 +17,10 @@ const ENGINE_CATALOG = {
   'bonus-seq': { label: 'Bonus Sequential', category: 'pairwise', engine: pairwiseEngines['bonus-seq'] },
   'bonus-fam': { label: 'Bonus Family', category: 'pairwise', engine: pairwiseEngines['bonus-fam'] },
   'bonus-v2': { label: 'Bonus V2', category: 'pairwise', engine: pairwiseEngines['bonus-v2'] },
-  v3: { label: 'V3 Locked Sets', category: 'triplet', engine: null },
+  // V3 bundles 6 sub-analyses (zone analysis, hot numbers, remainders,
+  // locked-set backtests) over a fixed chart, not the pairwise shape - it
+  // has its own routes (/api/v3/analysis) like Repeats.
+  v3: { label: 'V3 Locked Sets', category: 'triplet', engine: null, implemented: true },
   // Repeats doesn't fit the generic pairwise discover/buildCards shape (it's
   // a stateless live computation, not a persisted pattern set) so it's
   // served by its own routes (/api/repeats/*) rather than /api/engines/:code

@@ -6,6 +6,7 @@ import { Home } from '../pages/Home';
 import { Draws } from '../pages/Draws';
 import { EnginePage } from '../pages/engines/EnginePage';
 import { Repeats } from '../pages/Repeats';
+import { V3 } from '../pages/V3';
 import { ComingSoon } from '../pages/ComingSoon';
 import { PAIRWISE_ENGINE_NAV } from './engineNav';
 
@@ -34,7 +35,7 @@ export const router = createBrowserRouter([
         ),
       },
       ...engineRoutes,
-      { path: 'engines/v3', element: <ComingSoon title="V3 Locked Sets" /> },
+      { path: 'engines/v3', element: <V3 /> },
       { path: 'repeats', element: <Repeats /> },
       { path: 'best-pairs', element: <ComingSoon title="Combinaisons" /> },
       {
