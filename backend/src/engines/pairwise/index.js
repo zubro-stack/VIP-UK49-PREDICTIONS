@@ -7,14 +7,18 @@ const { bonusSequentialConfig } = require('./configs/bonus-sequential');
 const { bonusFamilyConfig } = require('./configs/bonus-family');
 const { bonusV2Config } = require('./configs/bonus-v2');
 
-const pairwiseEngines = {
-  'v1-seq': createPairwiseEngine(v1SequentialConfig),
-  'v1-fam': createPairwiseEngine(v1FamilyConfig),
-  v2: createPairwiseEngine(v2CrossDrawConfig),
-  'same-day': createPairwiseEngine(sameDayConfig),
-  'bonus-seq': createPairwiseEngine(bonusSequentialConfig),
-  'bonus-fam': createPairwiseEngine(bonusFamilyConfig),
-  'bonus-v2': createPairwiseEngine(bonusV2Config),
+const pairwiseConfigs = {
+  'v1-seq': v1SequentialConfig,
+  'v1-fam': v1FamilyConfig,
+  v2: v2CrossDrawConfig,
+  'same-day': sameDayConfig,
+  'bonus-seq': bonusSequentialConfig,
+  'bonus-fam': bonusFamilyConfig,
+  'bonus-v2': bonusV2Config,
 };
 
-module.exports = { pairwiseEngines };
+const pairwiseEngines = Object.fromEntries(
+  Object.entries(pairwiseConfigs).map(([code, config]) => [code, createPairwiseEngine(config)])
+);
+
+module.exports = { pairwiseEngines, pairwiseConfigs };

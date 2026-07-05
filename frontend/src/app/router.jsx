@@ -7,6 +7,7 @@ import { Draws } from '../pages/Draws';
 import { EnginePage } from '../pages/engines/EnginePage';
 import { Repeats } from '../pages/Repeats';
 import { V3 } from '../pages/V3';
+import { Backtesting } from '../pages/Backtesting';
 import { ComingSoon } from '../pages/ComingSoon';
 import { PAIRWISE_ENGINE_NAV } from './engineNav';
 
@@ -42,7 +43,7 @@ export const router = createBrowserRouter([
         path: 'backtesting',
         element: (
           <ProtectedRoute minRole="manager">
-            <ComingSoon title="Backtesting" />
+            <Backtesting />
           </ProtectedRoute>
         ),
       },
