@@ -56,8 +56,10 @@ test('computeCalcResult defaults to the most recent Lunch/Tea and verifies again
   assert.equal(result.lunch.s1.length, 6);
   assert.equal(result.tea.s2.length, 6);
   // generateDraws(24, ...) covers 2026-01-01..2026-01-24; no 2026-01-25 exists, so unverified.
-  assert.equal(result.verified, false);
-  assert.equal(result.nextDate, '2026-01-25');
+  assert.equal(result.lunch.verified, false);
+  assert.equal(result.lunch.nextDate, '2026-01-25');
+  assert.equal(result.tea.verified, false);
+  assert.equal(result.tea.nextDate, '2026-01-25');
 });
 
 test('computeCalcResult verifies once a next-day draw is picked as the source', () => {
@@ -65,7 +67,28 @@ test('computeCalcResult verifies once a next-day draw is picked as the source', 
   const earlyLunch = draws.find((d) => d.drawDate === '2026-01-05' && d.drawType === 'lunch');
   const earlyTea = draws.find((d) => d.drawDate === '2026-01-05' && d.drawType === 'tea');
   const result = computeCalcResult(draws, { lunchDrawId: earlyLunch.id, teaDrawId: earlyTea.id });
-  assert.equal(result.nextDate, '2026-01-06');
-  assert.equal(result.verified, true);
-  assert.ok(result.nextLunch || result.nextTea);
+  assert.equal(result.lunch.nextDate, '2026-01-06');
+  assert.equal(result.lunch.verified, true);
+  assert.equal(result.tea.nextDate, '2026-01-06');
+  assert.equal(result.tea.verified, true);
+});
+
+test('computeCalcResult verifies each column against ITS OWN next-day draws when Lunch and Tea sources come from different dates', () => {
+  const draws = generateDraws(24, 42);
+  const earlyLunch = draws.find((d) => d.drawDate === '2026-01-05' && d.drawType === 'lunch');
+  // Tea defaults to the most recent (2026-01-24) - a different date than the Lunch source.
+  const result = computeCalcResult(draws, { lunchDrawId: earlyLunch.id });
+  assert.equal(result.lunch.nextDate, '2026-01-06');
+  assert.equal(result.lunch.verified, true, 'Lunch must be verified against 2026-01-06, not the Tea source date');
+  assert.equal(result.tea.nextDate, '2026-01-25');
+  assert.equal(result.tea.verified, false);
+});
+
+test('computeCalcResult falls back to the most recent draw when an unknown id is given', () => {
+  const draws = generateDraws(24, 42);
+  const result = computeCalcResult(draws, { lunchDrawId: 'does-not-exist', teaDrawId: 'also-missing' });
+  assert.ok(result.lunch);
+  assert.ok(result.tea);
+  assert.equal(result.lunch.draw.drawDate, '2026-01-24');
+  assert.equal(result.tea.draw.drawDate, '2026-01-24');
 });

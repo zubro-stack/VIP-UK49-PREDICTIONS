@@ -1,19 +1,17 @@
 const { prisma } = require('../config/db');
-const { computeDailyTriplet, TOTAL_TRIPLETS } = require('../engines/daily-triplet/daily-triplet');
+const { computeDailyTriplet } = require('../engines/daily-triplet/daily-triplet');
 
 /**
  * Everyone whose slot lands on the same combination as `dailySlot` today
- * shares this user's triplet - two slots exactly TOTAL_TRIPLETS apart
- * always coincide, so this counts users at every such offset via modular
- * arithmetic in SQL (a plain equality check can't express "same value
- * mod N" in Prisma's query builder).
+ * shares this user's triplet. Two slots exactly TOTAL_TRIPLETS (18424)
+ * apart would technically coincide too, but at realistic signup counts
+ * (nowhere near 18424 users) that can't happen yet, so a plain equality
+ * check - which can use the unique index on daily_slot - is both correct
+ * and fast today. Revisit with a modular query (and a test for it) once
+ * the user count approaches TOTAL_TRIPLETS.
  */
 async function countSharingSlot(dailySlot) {
-  const rows = await prisma.$queryRaw`
-    SELECT COUNT(*)::int AS count FROM "users"
-    WHERE MOD("daily_slot" - 1, ${TOTAL_TRIPLETS}) = MOD(${dailySlot}::int - 1, ${TOTAL_TRIPLETS})
-  `;
-  return rows[0]?.count ?? 1;
+  return prisma.user.count({ where: { dailySlot } });
 }
 
 async function getForUser(user) {

@@ -8,10 +8,11 @@ const { pairwiseEngines } = require('../../src/engines/pairwise');
 
 const draws = generateDraws(24, 42);
 
-test('BACKTESTABLE_CODES covers all 7 pairwise engines plus repeats and v3', () => {
+test('BACKTESTABLE_CODES covers all 7 pairwise engines plus repeats, v3 and calc', () => {
   Object.keys(pairwiseEngines).forEach((code) => assert.ok(BACKTESTABLE_CODES.includes(code)));
   assert.ok(BACKTESTABLE_CODES.includes('repeats'));
   assert.ok(BACKTESTABLE_CODES.includes('v3'));
+  assert.ok(BACKTESTABLE_CODES.includes('calc'));
 });
 
 test('runPairwiseBacktest actually detects real hits (not just always zero)', () => {
@@ -35,7 +36,7 @@ test('runPairwiseBacktest is consistent across all 7 pairwise engines', () => {
   });
 });
 
-test('runBacktest dispatches to repeats and v3 performance functions', () => {
+test('runBacktest dispatches to repeats, v3 and calc performance functions', () => {
   const repeats = runBacktest('repeats', draws);
   assert.ok(Array.isArray(repeats.breakdown));
   assert.ok(repeats.summary.totalHits <= repeats.summary.totalPredictions);
@@ -43,6 +44,12 @@ test('runBacktest dispatches to repeats and v3 performance functions', () => {
   const v3 = runBacktest('v3', draws);
   assert.ok(Array.isArray(v3.breakdown));
   assert.ok(v3.summary.totalHits <= v3.summary.totalPredictions);
+
+  const calc = runBacktest('calc', draws);
+  assert.ok(Array.isArray(calc.breakdown));
+  assert.equal(calc.breakdown.length, 6);
+  assert.ok(calc.summary.totalHits <= calc.summary.totalPredictions);
+  assert.ok(calc.summary.totalPredictions > 0);
 });
 
 test('runBacktest rejects an engine with no backtest support', () => {

@@ -9,9 +9,10 @@ export const PAIRWISE_ENGINE_NAV = [
   { code: 'bonus-v2', path: 'bonus-v2', label: 'Bonus V2' },
 ];
 
-/** Every engine that supports backtesting - the 7 pairwise engines plus Repeats and V3. */
+/** Every engine that supports backtesting - the 7 pairwise engines plus Repeats, V3 and Calc. */
 export const BACKTESTABLE_ENGINE_LABELS = {
   ...Object.fromEntries(PAIRWISE_ENGINE_NAV.map((e) => [e.code, e.label])),
   repeats: 'Repeats Tracker',
   v3: 'V3 Locked Sets',
+  calc: 'Calculator',
 };

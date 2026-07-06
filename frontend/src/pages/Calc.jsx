@@ -5,7 +5,7 @@ import { Card } from '../components/ui/Card';
 import { Chip } from '../components/ui/Chip';
 import { NumberBall } from '../components/ui/NumberBall';
 
-const HIT_TONE = { same: 'good', other: 'warn', miss: 'default', none: 'default' };
+const HIT_TONE = { same: 'v1', other: 'v2', miss: 'default', none: 'default' };
 const STRAT_LABEL = { s1: 'S1 · Multiplier & décalage', s2: 'S2 · Moins 5', s3: 'S3 · Chaîne bonus +8' };
 const TABS = [
   { key: 'calc', label: 'Calculateur' },
@@ -17,26 +17,26 @@ function PredictionRow({ label, predictions }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', flexWrap: 'wrap' }}>
       <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--t3)', width: 24 }}>{label}</span>
       {predictions.map((p, i) => (
-        <NumberBall
-          key={i}
-          value={p.value ?? 'N'}
-          size={28}
-          tone={HIT_TONE[p.hit] === 'good' ? 'v1' : HIT_TONE[p.hit] === 'warn' ? 'v2' : 'default'}
-        />
+        <NumberBall key={i} value={p.value ?? 'N'} size={28} tone={HIT_TONE[p.hit] ?? 'default'} />
       ))}
     </div>
   );
 }
 
-function DrawColumn({ title, result }) {
-  if (!result) return null;
+function DrawColumn({ title, column }) {
+  if (!column) return null;
   return (
     <Card>
-      <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 2 }}>{title}</div>
-      <div style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 10 }}>{result.draw.drawDate?.slice(0, 10)}</div>
-      <PredictionRow label="S1" predictions={result.s1} />
-      <PredictionRow label="S2" predictions={result.s2} />
-      <PredictionRow label="S3" predictions={result.s3} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+        <div style={{ fontWeight: 700, fontSize: 13 }}>{title}</div>
+        <Chip tone={column.verified ? 'good' : 'default'}>{column.verified ? 'Vérifié' : 'En attente'}</Chip>
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 10 }}>
+        {column.draw.drawDate?.slice(0, 10)} → cible {column.nextDate}
+      </div>
+      <PredictionRow label="S1" predictions={column.s1} />
+      <PredictionRow label="S2" predictions={column.s2} />
+      <PredictionRow label="S3" predictions={column.s3} />
     </Card>
   );
 }
@@ -46,16 +46,14 @@ export function Calc() {
   const [draws, setDraws] = useState([]);
   const [lunchDrawId, setLunchDrawId] = useState(null);
   const [teaDrawId, setTeaDrawId] = useState(null);
-  const [result, setResult] = useState(null);
-  const [tracker, setTracker] = useState(null);
+  const [page, setPage] = useState(null);
 
   useEffect(() => {
     drawsApi.list().then(setDraws);
-    calcApi.getTracker().then(setTracker);
   }, []);
 
   useEffect(() => {
-    calcApi.getResult({ lunchDrawId, teaDrawId }).then(setResult);
+    calcApi.getPage({ lunchDrawId, teaDrawId }).then(setPage);
   }, [lunchDrawId, teaDrawId]);
 
   const dates = useMemo(() => {
@@ -72,6 +70,9 @@ export function Calc() {
     setLunchDrawId(day.lunch?.id ?? null);
     setTeaDrawId(day.tea?.id ?? null);
   }
+
+  const result = page?.result;
+  const tracker = page?.tracker;
 
   return (
     <div>
@@ -119,16 +120,10 @@ export function Calc() {
             {result ? (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-                  <DrawColumn title="☀ Lunch" result={result.lunch} />
-                  <DrawColumn title="☾ Tea" result={result.tea} />
+                  <DrawColumn title="☀ Lunch" column={result.lunch} />
+                  <DrawColumn title="☾ Tea" column={result.tea} />
                 </div>
                 <Card style={{ marginBottom: 12 }}>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
-                    <Chip tone={result.verified ? 'good' : 'default'}>
-                      {result.verified ? 'Vérifié' : 'En attente'}
-                    </Chip>
-                    <span style={{ fontSize: 11, color: 'var(--t3)' }}>Cible : {result.nextDate}</span>
-                  </div>
                   <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--t3)' }}>
                     <span><Chip tone="good">■</Chip> même type de tirage</span>
                     <span><Chip tone="warn">■</Chip> autre type de tirage</span>

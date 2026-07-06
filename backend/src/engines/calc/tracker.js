@@ -15,12 +15,12 @@ function makeAccumulator(positions) {
   };
 }
 
-function accumulate(acc, predictions, targetValues, maxPositions) {
+/** `predictions` must already be truncated to acc's position count by the caller (e.g. strat3's variable-length output). */
+function accumulate(acc, predictions, targetValues) {
   acc.analyzed++;
   let hits = 0;
   const posHit = [];
   predictions.forEach((n, i) => {
-    if (maxPositions != null && i > maxPositions - 1) return;
     acc.posTried[i]++;
     const hit = n !== null && targetValues.includes(n);
     posHit.push(hit);
@@ -71,9 +71,9 @@ function computeTrackerStats(draws) {
 
     function check(source, accS1, accS2, accS3, targetValues) {
       if (!source) return;
-      accumulate(accS1, strat1(source.numbers), targetValues, null);
-      accumulate(accS2, strat2(source.numbers), targetValues, null);
-      if (source.bonus != null) accumulate(accS3, strat3(source.bonus), targetValues, 6);
+      accumulate(accS1, strat1(source.numbers), targetValues);
+      accumulate(accS2, strat2(source.numbers), targetValues);
+      if (source.bonus != null) accumulate(accS3, strat3(source.bonus).slice(0, 6), targetValues);
     }
 
     check(lunch, acc.s1l, acc.s2l, acc.s3l, nLValues);

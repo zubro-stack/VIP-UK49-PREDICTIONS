@@ -1,12 +1,9 @@
 import { httpClient } from './httpClient';
 
 export const calcApi = {
-  async getResult({ lunchDrawId, teaDrawId } = {}) {
-    const { data } = await httpClient.get('/calc/result', { params: { lunchDrawId, teaDrawId } });
-    return data;
-  },
-  async getTracker() {
-    const { data } = await httpClient.get('/calc/tracker');
+  /** One combined fetch for both the live result and the tracker - avoids two separate full draws-table round trips. */
+  async getPage({ lunchDrawId, teaDrawId } = {}) {
+    const { data } = await httpClient.get('/calc', { params: { lunchDrawId, teaDrawId } });
     return data;
   },
 };

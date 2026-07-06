@@ -7,7 +7,6 @@ const { getResultSchema } = require('../validators/calc.validators');
 const router = Router();
 router.use(requireAuth);
 
-router.get('/result', validate(getResultSchema), controller.getResult);
-router.get('/tracker', controller.getTracker);
+router.get('/', validate(getResultSchema), controller.getPage);
 
 module.exports = router;

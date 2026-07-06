@@ -2,14 +2,13 @@ const drawsRepository = require('../repositories/draws.repository');
 const { computeCalcResult } = require('../engines/calc/calc-engine');
 const { computeTrackerStats } = require('../engines/calc/tracker');
 
-async function getResult({ lunchDrawId, teaDrawId } = {}) {
+/** Fetches the draw history once and derives both the live result and the tracker from it, instead of two separate full-table fetches. */
+async function getPage({ lunchDrawId, teaDrawId } = {}) {
   const draws = await drawsRepository.listForEngines();
-  return computeCalcResult(draws, { lunchDrawId, teaDrawId });
+  return {
+    result: computeCalcResult(draws, { lunchDrawId, teaDrawId }),
+    tracker: computeTrackerStats(draws),
+  };
 }
 
-async function getTracker() {
-  const draws = await drawsRepository.listForEngines();
-  return computeTrackerStats(draws);
-}
-
-module.exports = { getResult, getTracker };
+module.exports = { getPage };
