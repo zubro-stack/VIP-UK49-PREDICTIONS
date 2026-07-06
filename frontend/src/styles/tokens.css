@@ -2,10 +2,12 @@
   --bg: #0f1115;
   --s: #151821;
   --s2: #1c202b;
+  --s3: #242938;
   --b: #2a2f3a;
   --t: #eef0f3;
   --t2: #b7bfcb;
   --t3: #7c8494;
+  --t4: #545b6a;
   --f: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   --v1: #6aa8ff;
@@ -23,6 +25,29 @@
   --rd: #f5a5a5;
   --am: #f2b84b;
   --aml: #3a2c12;
+
+  /* Spacing scale - used for consistent rhythm across pages/components */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* Radius scale */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-pill: 100px;
+
+  /* Elevation - dark theme relies on lighter surfaces rather than shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-focus: 0 0 0 3px rgba(106, 168, 255, 0.35);
+
+  --header-h: 60px;
+  --sidebar-w: 232px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -30,9 +55,14 @@
     --bg: #f5f6f8;
     --s: #ffffff;
     --s2: #eef0f4;
+    --s3: #e4e8ef;
     --b: #dde1e8;
     --t: #14161a;
     --t2: #4b5563;
     --t3: #8892a0;
+    --t4: #aab1bd;
+
+    --shadow-sm: 0 1px 2px rgba(20, 22, 26, 0.06);
+    --shadow-md: 0 8px 24px rgba(20, 22, 26, 0.08);
   }
 }

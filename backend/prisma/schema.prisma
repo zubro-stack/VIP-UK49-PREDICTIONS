@@ -79,17 +79,6 @@ model Draw {
   @@map("draws")
 }
 
-model EngineDefinition {
-  code     String  @id
-  label    String
-  category String
-  config   Json?
-
-  patterns Pattern[]
-
-  @@map("engine_definitions")
-}
-
 model Pattern {
   id           String        @id @default(uuid())
   engineCode   String        @map("engine_code")
@@ -104,7 +93,6 @@ model Pattern {
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
 
-  engine  EngineDefinition  @relation(fields: [engineCode], references: [code])
   history PatternHistory[]
 
   @@unique([engineCode, drawType, positionA, positionB])

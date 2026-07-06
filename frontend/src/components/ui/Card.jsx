@@ -1,14 +1,6 @@
-export function Card({ children, style }) {
+export function Card({ children, style, interactive = false, className = '' }) {
   return (
-    <div
-      style={{
-        background: 'var(--s)',
-        border: '1px solid var(--b)',
-        borderRadius: 12,
-        padding: 16,
-        ...style,
-      }}
-    >
+    <div className={`card ${interactive ? 'card-interactive' : ''} ${className}`.trim()} style={style}>
       {children}
     </div>
   );

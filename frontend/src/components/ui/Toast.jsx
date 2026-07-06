@@ -7,15 +7,18 @@ export function Toast() {
     <div
       style={{
         position: 'fixed',
-        bottom: 20,
-        right: 20,
-        padding: '10px 16px',
-        borderRadius: 8,
+        bottom: 24,
+        right: 24,
+        padding: '12px 18px',
+        borderRadius: 'var(--r-sm)',
         background: toast.isError ? 'var(--rdl)' : 'var(--gnl)',
         color: toast.isError ? 'var(--rd)' : 'var(--gnd)',
         border: `1px solid ${toast.isError ? '#F5A5A5' : '#6EE7B7'}`,
         fontSize: 13,
+        fontWeight: 600,
+        boxShadow: 'var(--shadow-md)',
         zIndex: 1000,
+        animation: 'toast-in 0.18s ease-out',
       }}
     >
       {toast.message}

@@ -4,11 +4,17 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--t);
   font-family: var(--f);
+  line-height: 1.5;
 }
 
 button {
@@ -16,8 +22,13 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 input,
-select {
+select,
+textarea {
   font-family: inherit;
 }
 
@@ -25,9 +36,35 @@ a {
   color: inherit;
 }
 
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--r-sm);
+}
+
+::selection {
+  background: var(--v1l);
+  color: var(--v1);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--b);
+  border-radius: var(--r-pill);
+  border: 2px solid var(--s);
+}
+
 .app-shell {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: var(--sidebar-w) 1fr;
   min-height: 100vh;
 }
 
@@ -38,7 +75,156 @@ a {
 }
 
 .main-content {
-  padding: 24px;
-  max-width: 1100px;
+  padding: var(--sp-6) var(--sp-8) 80px;
+  max-width: 1140px;
   width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  font-size: 13px;
+  border: 1px solid transparent;
+  transition: filter 0.12s ease, transform 0.05s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+}
+
+.btn-primary {
+  background: var(--v1);
+  color: #0b1220;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--t2);
+  border-color: var(--b);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--s2);
+  color: var(--t);
+}
+
+.btn-danger {
+  background: var(--rdl);
+  color: var(--rd);
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--s);
+  border: 1px solid var(--b);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.card-interactive:hover {
+  border-color: var(--v1);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* ── Nav links (sidebar) ─────────────────────────────────────────────── */
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.nav-link:hover {
+  background: var(--s2);
+  color: var(--t);
+}
+
+.nav-link.active {
+  background: var(--v1l);
+  color: var(--v1);
+  font-weight: 700;
+  border-left-color: var(--v1);
+}
+
+.nav-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* ── Tab bars (engine group pages, Calc, V3) ────────────────────────── */
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--b);
+  margin-bottom: var(--sp-4);
+}
+
+.tab-btn {
+  padding: 9px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: transparent;
+  color: var(--t3);
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.tab-btn:hover {
+  color: var(--t);
+  background: var(--s2);
+}
+
+.tab-btn.active {
+  color: var(--v1);
+  border-bottom-color: var(--v1);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

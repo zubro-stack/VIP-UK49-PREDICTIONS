@@ -18,8 +18,9 @@ export function NumberBall({ value, size = 32, tone = 'default' }) {
         background: bg,
         color: fg,
         fontWeight: 700,
-        fontSize: size <= 24 ? 10 : 12,
+        fontSize: size <= 24 ? 10 : size <= 40 ? 12 : 16,
         border: '1px solid var(--b)',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
       {value}

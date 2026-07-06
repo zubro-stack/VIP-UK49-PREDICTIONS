@@ -14,20 +14,12 @@ export function EngineGroupPage({ label, tabs }) {
   return (
     <div>
       {tabs.length > 1 && (
-        <div style={{ display: 'flex', gap: 4, borderBottom: '1px solid var(--b)', marginBottom: 16 }}>
+        <div className="tab-bar">
           {tabs.map((tab) => (
             <button
               key={tab.code}
               onClick={() => setActiveCode(tab.code)}
-              style={{
-                padding: '8px 16px',
-                fontSize: 12,
-                fontWeight: 700,
-                background: 'transparent',
-                color: activeCode === tab.code ? 'var(--v1)' : 'var(--t3)',
-                borderBottom: activeCode === tab.code ? '2px solid var(--v1)' : '2px solid transparent',
-                borderRadius: 0,
-              }}
+              className={`tab-btn${activeCode === tab.code ? ' active' : ''}`}
             >
               {tab.label.toUpperCase()}
             </button>

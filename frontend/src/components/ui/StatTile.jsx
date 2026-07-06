@@ -3,10 +3,11 @@ export function StatTile({ value, label, tone }) {
     <div
       style={{
         background: tone ?? 'var(--s2)',
-        borderRadius: 8,
-        padding: '10px 14px',
+        border: '1px solid var(--b)',
+        borderRadius: 'var(--r-sm)',
+        padding: '10px 16px',
         textAlign: 'center',
-        minWidth: 64,
+        minWidth: 68,
       }}
     >
       <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--t)' }}>{value}</div>

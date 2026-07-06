@@ -81,16 +81,12 @@ export function Calc() {
         Applique 3 stratégies de transformation à un tirage source et vérifie les prédictions contre les tirages suivants.
       </p>
 
-      <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid var(--b)' }}>
+      <div className="tab-bar">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            style={{
-              padding: '8px 14px', fontSize: 12, fontWeight: 700, background: 'none', border: 'none',
-              borderBottom: tab === t.key ? '2px solid var(--v1)' : '2px solid transparent',
-              color: tab === t.key ? 'var(--v1)' : 'var(--t3)',
-            }}
+            className={`tab-btn${tab === t.key ? ' active' : ''}`}
           >
             {t.label}
           </button>

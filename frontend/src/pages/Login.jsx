@@ -4,6 +4,16 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 
+const inputStyle = {
+  padding: '11px 12px',
+  borderRadius: 'var(--r-sm)',
+  border: '1px solid var(--b)',
+  background: 'var(--s2)',
+  color: 'var(--t)',
+  fontSize: 14,
+  width: '100%',
+};
+
 export function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -27,17 +37,44 @@ export function Login() {
   }
 
   return (
-    <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}>
-      <Card style={{ width: 340 }}>
-        <h1 style={{ fontSize: 18, marginBottom: 16 }}>Connexion</h1>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div
+      style={{
+        display: 'grid',
+        placeItems: 'center',
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at 50% 0%, var(--v1l) 0%, var(--bg) 55%)',
+      }}
+    >
+      <Card style={{ width: 360, padding: 'var(--sp-6)', boxShadow: 'var(--shadow-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 'var(--sp-5)' }}>
+          <span
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 'var(--r-md)',
+              background: 'var(--v1l)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 22,
+              marginBottom: 'var(--sp-3)',
+            }}
+          >
+            🎱
+          </span>
+          <h1 style={{ fontSize: 18, fontWeight: 800, marginBottom: 2 }}>UK49s Predictions</h1>
+          <p style={{ fontSize: 12.5, color: 'var(--t3)', margin: 0 }}>Connectez-vous à votre compte</p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)' }}>
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ padding: 10, borderRadius: 8, border: '1px solid var(--b)', background: 'var(--s2)', color: 'var(--t)' }}
+            autoFocus
+            style={inputStyle}
           />
           <input
             type="password"
@@ -45,10 +82,25 @@ export function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ padding: 10, borderRadius: 8, border: '1px solid var(--b)', background: 'var(--s2)', color: 'var(--t)' }}
+            style={inputStyle}
           />
-          {error && <span style={{ color: 'var(--rd)', fontSize: 13 }}>{error}</span>}
-          <Button type="submit" disabled={loading}>{loading ? 'Connexion…' : 'Se connecter'}</Button>
+          {error && (
+            <div
+              style={{
+                background: 'var(--rdl)',
+                color: 'var(--rd)',
+                fontSize: 12.5,
+                fontWeight: 600,
+                padding: '8px 12px',
+                borderRadius: 'var(--r-sm)',
+              }}
+            >
+              {error}
+            </div>
+          )}
+          <Button type="submit" disabled={loading} style={{ width: '100%', marginTop: 4, padding: '11px 18px' }}>
+            {loading ? 'Connexion…' : 'Se connecter'}
+          </Button>
         </form>
       </Card>
     </div>

@@ -16,15 +16,15 @@ function DailyTripletCard() {
   if (!triplet) return null;
 
   return (
-    <Card style={{ marginBottom: 20, borderTop: '3px solid var(--v3)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+    <Card style={{ marginBottom: 'var(--sp-6)', borderTop: '3px solid var(--v3)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--sp-4)' }}>
         <div>
           <div style={{ fontWeight: 700, fontSize: 13 }}>Votre triplet du jour</div>
           <div style={{ fontSize: 11, color: 'var(--t3)' }}>{triplet.date}</div>
         </div>
         {triplet.sharingCount > 1 && <Chip tone="warn">{triplet.sharingCount} comptes partagent ce triplet</Chip>}
       </div>
-      <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', padding: '8px 0 4px' }}>
         {triplet.triplet.map((n) => (
           <NumberBall key={n} value={n} size={56} tone="v3" />
         ))}
@@ -44,18 +44,18 @@ export function Home() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Bonjour {user?.displayName}</h1>
-      <p style={{ color: 'var(--t2)', marginBottom: 24 }}>
+      <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.3, marginBottom: 6 }}>Bonjour {user?.displayName}</h1>
+      <p style={{ color: 'var(--t2)', marginBottom: 'var(--sp-6)' }}>
         Choisissez un moteur d'analyse dans le menu pour consulter ses prédictions actives.
       </p>
 
       <DailyTripletCard />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 'var(--sp-3)' }}>
         {catalog.map((e) => (
-          <Card key={e.code}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <div style={{ fontWeight: 700 }}>{e.label}</div>
+          <Card key={e.code} interactive>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <div style={{ fontWeight: 700, fontSize: 13.5 }}>{e.label}</div>
               {!e.implemented && <Chip tone="warn">Bientôt</Chip>}
             </div>
             <div style={{ fontSize: 12, color: 'var(--t3)' }}>

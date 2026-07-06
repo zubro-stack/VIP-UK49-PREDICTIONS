@@ -24,16 +24,18 @@ export const ENGINE_PAGES = [
   {
     path: 'v1-sequential',
     label: 'V1 Sequential',
+    icon: '⚡',
     tabs: [
       { code: 'v1-seq', label: 'Sequential' },
       { code: 'v1-fam', label: 'Family' },
     ],
   },
-  { path: 'v2', label: 'V2 Cross-Pattern', tabs: [{ code: 'v2', label: 'V2 Cross-Pattern' }] },
-  { path: 'lunchtime-teatime', label: 'Lunchtime to Teatime', tabs: [{ code: 'same-day', label: 'Lunchtime to Teatime' }] },
+  { path: 'v2', label: 'V2 Cross-Pattern', icon: '🔀', tabs: [{ code: 'v2', label: 'V2 Cross-Pattern' }] },
+  { path: 'lunchtime-teatime', label: 'Lunchtime to Teatime', icon: '☀️', tabs: [{ code: 'same-day', label: 'Lunchtime to Teatime' }] },
   {
     path: 'bonus-tracker',
     label: 'Bonus Tracker',
+    icon: '🎱',
     tabs: [
       { code: 'bonus-seq', label: 'Sequential' },
       { code: 'bonus-fam', label: 'Family' },

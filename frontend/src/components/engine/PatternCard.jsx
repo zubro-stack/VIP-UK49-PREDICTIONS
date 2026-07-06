@@ -10,7 +10,7 @@ const POSITION_LABELS = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'B'];
 
 export function PatternCard({ card, canManage, onMiss, onDelete }) {
   return (
-    <Card>
+    <Card interactive>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {card.drawType && <Chip>{card.drawType === 'lunch' ? 'Lunch' : 'Tea'}</Chip>}
