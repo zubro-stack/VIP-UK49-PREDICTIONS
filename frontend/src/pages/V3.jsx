@@ -40,7 +40,7 @@ export function V3() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 22 }}>V3 — Zubro Tracker</h1>
+        <h1 style={{ fontSize: 22 }}>V3 Zubro Tracker</h1>
       </div>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>

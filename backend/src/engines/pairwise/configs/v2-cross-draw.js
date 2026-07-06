@@ -7,7 +7,7 @@ const { ALL_PAIRS } = require('./position-spaces');
  */
 const v2CrossDrawConfig = {
   code: 'v2',
-  label: 'V2 Cross-Draw',
+  label: 'V2 Cross-Pattern',
   trackDirectHits: true,
 
   buildUnits(sorted) {

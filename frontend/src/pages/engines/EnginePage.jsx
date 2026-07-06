@@ -5,9 +5,11 @@ import { PatternCard } from '../../components/engine/PatternCard';
 import { Button } from '../../components/ui/Button';
 
 /**
- * One page component drives all 7 pairwise-engine routes (V1 Sequential,
- * V1 Family, V2, Same Day, Bonus Sequential/Family/V2) — only the engine
- * code and label change, mirroring the backend's single generic engine.
+ * Renders one pairwise-engine's predictions - only the engine code and
+ * label change, mirroring the backend's single generic engine. Used
+ * directly for single-algorithm pages (V2, Lunchtime to Teatime) and
+ * wrapped by EngineGroupPage for pages that bundle several algorithms
+ * behind tabs (V1, Bonus Tracker).
  */
 export function EnginePage({ code, label }) {
   const { cards, status, run, recordMiss, deletePattern } = useEngine(code);

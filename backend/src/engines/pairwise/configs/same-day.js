@@ -7,7 +7,7 @@ const { ALL_PAIRS_UNORDERED } = require('./position-spaces');
  */
 const sameDayConfig = {
   code: 'same-day',
-  label: 'Same Day',
+  label: 'Lunchtime to Teatime',
   trackDirectHits: false,
 
   buildUnits(sorted) {

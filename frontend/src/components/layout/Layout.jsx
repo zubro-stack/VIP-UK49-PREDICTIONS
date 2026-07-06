@@ -2,7 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useRole } from '../../hooks/useRole';
 import { Toast } from '../ui/Toast';
-import { PAIRWISE_ENGINE_NAV } from '../../app/engineNav';
+import { ENGINE_PAGES } from '../../app/engineNav';
 
 const linkStyle = ({ isActive }) => ({
   display: 'block',
@@ -41,16 +41,16 @@ export function Layout() {
         </NavSection>
 
         <NavSection title="Moteurs">
-          {PAIRWISE_ENGINE_NAV.map((e) => (
-            <NavLink key={e.code} to={`/engines/${e.path}`} style={linkStyle}>{e.label}</NavLink>
+          {ENGINE_PAGES.map((e) => (
+            <NavLink key={e.path} to={`/engines/${e.path}`} style={linkStyle}>{e.label}</NavLink>
           ))}
-          <NavLink to="/engines/v3" style={linkStyle}>V3 Locked Sets</NavLink>
+          <NavLink to="/engines/v3" style={linkStyle}>V3 Zubro Tracker</NavLink>
           <NavLink to="/repeats" style={linkStyle}>Repeats Tracker</NavLink>
         </NavSection>
 
         <NavSection title="Outils">
-          <NavLink to="/best-pairs" style={linkStyle}>Combinaisons</NavLink>
-          <NavLink to="/calc" style={linkStyle}>Calculateur</NavLink>
+          <NavLink to="/best-pairs" style={linkStyle}>Best Pairs</NavLink>
+          <NavLink to="/calc" style={linkStyle}>Prediction Calc</NavLink>
           {isManager && <NavLink to="/backtesting" style={linkStyle}>Backtesting</NavLink>}
           <NavLink to="/posts" style={linkStyle}>Publications</NavLink>
           <NavLink to="/faq" style={linkStyle}>FAQ</NavLink>

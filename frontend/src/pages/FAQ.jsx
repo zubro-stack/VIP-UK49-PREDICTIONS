@@ -23,7 +23,7 @@ const STATUS = [
 const ENGINES = [
   ['V1 Sequential', 'Paires de positions au sein d\'un même tirage dont la somme ou la différence apparaît régulièrement le lendemain.'],
   ['V1 Family', 'Compare des positions entre deux tirages consécutifs du même type. Lunch↔Lunch ou Tea↔Tea.'],
-  ['Same Day', 'Utilise des paires de positions du Lunch pour prédire des numéros du Tea du même jour.'],
+  ['Lunchtime to Teatime', 'Utilise des paires de positions du Lunch pour prédire des numéros du Tea du même jour.'],
   ['V3 Zubro Tracker', '50 groupes de charte prédéfinis. Quand 2+ membres apparaissent dans les tirages récents, les membres restants sont signalés.'],
   ['Best Pairs Engine', 'À partir de vos numéros, trouve les combinaisons qui partagent une ligne de la charte Zubro.'],
 ];

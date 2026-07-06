@@ -76,7 +76,7 @@ export function Calc() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Calculateur</h1>
+      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Prediction Calc</h1>
       <p style={{ color: 'var(--t2)', marginBottom: 16 }}>
         Applique 3 stratégies de transformation à un tirage source et vérifie les prédictions contre les tirages suivants.
       </p>

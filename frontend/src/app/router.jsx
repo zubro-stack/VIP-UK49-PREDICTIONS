@@ -4,7 +4,7 @@ import { ProtectedRoute } from '../components/layout/ProtectedRoute';
 import { Login } from '../pages/Login';
 import { Home } from '../pages/Home';
 import { Draws } from '../pages/Draws';
-import { EnginePage } from '../pages/engines/EnginePage';
+import { EngineGroupPage } from '../pages/engines/EngineGroupPage';
 import { Repeats } from '../pages/Repeats';
 import { V3 } from '../pages/V3';
 import { Backtesting } from '../pages/Backtesting';
@@ -13,11 +13,11 @@ import { Calc } from '../pages/Calc';
 import { Posts } from '../pages/Posts';
 import { FAQ } from '../pages/FAQ';
 import { AdminUsers } from '../pages/admin/Users';
-import { PAIRWISE_ENGINE_NAV } from './engineNav';
+import { ENGINE_PAGES } from './engineNav';
 
-const engineRoutes = PAIRWISE_ENGINE_NAV.map((e) => ({
+const engineRoutes = ENGINE_PAGES.map((e) => ({
   path: `engines/${e.path}`,
-  element: <EnginePage code={e.code} label={e.label} />,
+  element: <EngineGroupPage label={e.label} tabs={e.tabs} />,
 }));
 
 export const router = createBrowserRouter([

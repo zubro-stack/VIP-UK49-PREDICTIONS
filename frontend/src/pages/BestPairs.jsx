@@ -57,7 +57,7 @@ export function BestPairs() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Combinaisons</h1>
+      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Best Pairs</h1>
       <p style={{ color: 'var(--t2)', marginBottom: 16 }}>
         Sélectionnez vos numéros pour trouver les combinaisons qui apparaissent ensemble sur les lignes de la charte Zubro.
       </p>
