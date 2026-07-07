@@ -7,14 +7,16 @@ const { prisma } = require('../config/db');
  * table (patterns/history are a derived cache, not a source of truth).
  */
 async function replaceEngineResults(engineCode, discoveredPatterns) {
-  return prisma.$transaction(async (tx) => {
-    await tx.pattern.deleteMany({ where: { engineCode } });
-    // Independent creates (one per discovered pattern) - run concurrently
-    // within the transaction instead of one round trip at a time, since a
-    // single engine run can surface dozens of patterns.
-    await Promise.all(
-      discoveredPatterns.map((p) =>
-        tx.pattern.create({
+  return prisma.$transaction(
+    async (tx) => {
+      await tx.pattern.deleteMany({ where: { engineCode } });
+      // Sequential creates: an interactive transaction is bound to a single
+      // reserved connection, so firing these concurrently (Promise.all)
+      // doesn't parallelize anything - it just races queries against the
+      // same connection and risks "Transaction already closed" once a
+      // single engine run surfaces enough patterns to eat the timeout below.
+      for (const p of discoveredPatterns) {
+        await tx.pattern.create({
           data: {
             engineCode,
             drawType: p.drawType ?? null,
@@ -41,11 +43,12 @@ async function replaceEngineResults(engineCode, discoveredPatterns) {
                 })),
             },
           },
-        })
-      )
-    );
-    return tx.pattern.findMany({ where: { engineCode }, include: { history: true } });
-  });
+        });
+      }
+      return tx.pattern.findMany({ where: { engineCode }, include: { history: true } });
+    },
+    { timeout: 20000 }
+  );
 }
 
 function listByEngine(engineCode, { status } = {}) {
