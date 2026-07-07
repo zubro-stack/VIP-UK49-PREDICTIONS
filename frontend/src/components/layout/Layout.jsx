@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useRole } from '../../hooks/useRole';
+import { useUiStore } from '../../store/uiStore';
 import { Toast } from '../ui/Toast';
 import { ENGINE_PAGES } from '../../app/engineNav';
 
@@ -38,10 +39,15 @@ export function Layout() {
   const { user, logout } = useAuth();
   const isManager = useRole('manager');
   const isAdmin = useRole('admin');
+  const sidebarOpen = useUiStore((s) => s.sidebarOpen);
+  const toggleSidebar = useUiStore((s) => s.toggleSidebar);
+  const closeSidebar = useUiStore((s) => s.closeSidebar);
 
   return (
     <div className="app-shell">
+      <div className={`sidebar-backdrop${sidebarOpen ? ' visible' : ''}`} onClick={closeSidebar} />
       <aside
+        className={`sidebar${sidebarOpen ? ' open' : ''}`}
         style={{
           background: 'var(--s)',
           borderRight: '1px solid var(--b)',
@@ -69,7 +75,7 @@ export function Layout() {
           <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: -0.2 }}>UK49s Predictions</span>
         </div>
 
-        <div style={{ overflowY: 'auto', flex: 1 }}>
+        <div style={{ overflowY: 'auto', flex: 1 }} onClick={(e) => e.target.closest('a') && closeSidebar()}>
           <NavSection title="Vue d'ensemble">
             <NavItem to="/" end icon="🏠">Accueil</NavItem>
             {isManager && <NavItem to="/draws" icon="📊">Tirages</NavItem>}
@@ -113,6 +119,14 @@ export function Layout() {
             background: 'var(--bg)',
           }}
         >
+          <button
+            onClick={toggleSidebar}
+            className="btn btn-ghost hamburger-btn"
+            aria-label="Ouvrir le menu"
+            style={{ padding: '8px 10px', marginRight: 'auto' }}
+          >
+            ☰
+          </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span
               style={{
