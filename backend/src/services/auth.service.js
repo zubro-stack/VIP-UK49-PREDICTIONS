@@ -16,11 +16,16 @@ function issueTokens(user) {
   return { accessToken, refreshToken };
 }
 
+// Compared against on every login attempt for an email that doesn't match a
+// real account, so a missing account takes the same bcrypt-cost time as a
+// wrong password on a real one - otherwise the two cases are distinguishable
+// by response time alone, letting an attacker enumerate valid emails.
+const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 12);
+
 async function login(email, password) {
   const user = await usersRepository.findByEmail(email);
-  if (!user || !user.isActive) throw AppError.unauthorized('Invalid email or password');
-  const valid = await bcrypt.compare(password, user.passwordHash);
-  if (!valid) throw AppError.unauthorized('Invalid email or password');
+  const valid = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
+  if (!user || !user.isActive || !valid) throw AppError.unauthorized('Invalid email or password');
   return { user, ...issueTokens(user) };
 }
 
