@@ -58,7 +58,7 @@ function buildLockedSets(asOfIdx, sortedDraws) {
  *  2) Same-day Lunch only -> scored against that same day's Tea draw
  *     (catches same-day hits, not just next-day ones).
  */
-function computePairsTripletsPerformance(draws, limit = 30) {
+function computePairsTripletsPerformance(draws, limit = 60) {
   const sorted = sortDraws(draws);
   if (sorted.length < 2) return { pairRows: [], tripletRows: [] };
 
@@ -107,9 +107,20 @@ function computePairsTripletsPerformance(draws, limit = 30) {
     scoreAgainst(locked.lockedPairs, locked.lockedTriplets, [teaDraw], `${date} (Lunch)`);
   });
 
+  // Chronological descending order (most recent first), tea before lunch on
+  // a tie: appending all "same-day Lunch" checkpoint rows after all
+  // "end-of-day" rows and then reversing the combined array let the
+  // same-day-Tea rows (always appended last) push every Lunch row past the
+  // slice cutoff, so Performance never showed a Lunch row at all.
+  function chronologicalDesc(a, b) {
+    if (a.drawDate !== b.drawDate) return a.drawDate < b.drawDate ? 1 : -1;
+    if (a.drawType !== b.drawType) return a.drawType === 'tea' ? -1 : 1;
+    return 0;
+  }
+
   return {
-    pairRows: pairRows.reverse().slice(0, limit),
-    tripletRows: tripletRows.reverse().slice(0, limit),
+    pairRows: pairRows.sort(chronologicalDesc).slice(0, limit),
+    tripletRows: tripletRows.sort(chronologicalDesc).slice(0, limit),
   };
 }
 

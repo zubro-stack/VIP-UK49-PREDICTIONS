@@ -654,7 +654,19 @@ function ptHist(srt) {
     if (!lockedSD.lockedPairs.length && !lockedSD.lockedTriplets.length) return;
     scoreAgainst(lockedSD.lockedPairs, lockedSD.lockedTriplets, [teaDraw], `${d} (Lunch)`);
   });
-  return { pairRows: pairRows.slice().reverse().slice(0, 30), tripletRows: tripletRows.slice().reverse().slice(0, 30) };
+  // Matches the ordering fix applied to locked-sets.js's
+  // computePairsTripletsPerformance: sort chronologically descending (tea
+  // before lunch on a tie) instead of reverse()-ing the append order, which
+  // let same-day-Tea rows push every Lunch row past the slice cutoff.
+  function chronologicalDesc(a, b) {
+    if (a.drawDate !== b.drawDate) return a.drawDate < b.drawDate ? 1 : -1;
+    if (a.drawType !== b.drawType) return a.drawType === 'tea' ? -1 : 1;
+    return 0;
+  }
+  return {
+    pairRows: pairRows.slice().sort(chronologicalDesc).slice(0, 60),
+    tripletRows: tripletRows.slice().sort(chronologicalDesc).slice(0, 60),
+  };
 }
 
 function hitsHist(srt) {
