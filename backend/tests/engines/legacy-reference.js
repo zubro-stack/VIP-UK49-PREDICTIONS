@@ -179,17 +179,24 @@ function discoverBonusSeq(draws) {
     const nums = draw.numbers.concat([draw.bonus]);
     const tgts = sorted.filter((d) => Math.round((new Date(d.drawDate) - new Date(draw.drawDate)) / 86400000) === 1);
     if (!tgts.length) continue;
-    for (const [i, j] of SC.SEQ) {
-      const n1 = nums[i], n2 = nums[j];
-      const addPs = bonusNums(n1 + n2);
-      const sp = Math.abs(n1 - n2);
-      const subPs = sp >= 1 ? [sp] : [];
-      if (!addPs.length && !subPs.length) continue;
-      const ah = addPs.some((ap) => tgts.some((t) => eqv(ap, t.bonus)));
-      const sh = subPs.some((sp2) => tgts.some((t) => eqv(sp2, t.bonus)));
-      const key = `${draw.drawType}|bseq|${i}|${j}`;
-      if (!map.has(key)) map.set(key, { id: key, drawType: draw.drawType, p1: i, p2: j, history: [] });
-      map.get(key).history.push({ drawDate: draw.drawDate, v1: n1, v2: n2, addPreds: addPs, subPreds: subPs, addHit: ah, subHit: sh, hit: ah || sh });
+    // All 21 unordered position pairs (not just the 6 sequential
+    // neighbours) - a pair like POS1+Bonus is a legitimate combination to
+    // test here, since any two positions can sum/diff into a bonus-ball
+    // prediction, unlike V1 Sequential which is intentionally restricted
+    // to adjacent positions.
+    for (let i = 0; i < 7; i++) {
+      for (let j = i + 1; j < 7; j++) {
+        const n1 = nums[i], n2 = nums[j];
+        const addPs = bonusNums(n1 + n2);
+        const sp = Math.abs(n1 - n2);
+        const subPs = sp >= 1 ? [sp] : [];
+        if (!addPs.length && !subPs.length) continue;
+        const ah = addPs.some((ap) => tgts.some((t) => eqv(ap, t.bonus)));
+        const sh = subPs.some((sp2) => tgts.some((t) => eqv(sp2, t.bonus)));
+        const key = `${draw.drawType}|bseq|${i}|${j}`;
+        if (!map.has(key)) map.set(key, { id: key, drawType: draw.drawType, p1: i, p2: j, history: [] });
+        map.get(key).history.push({ drawDate: draw.drawDate, v1: n1, v2: n2, addPreds: addPs, subPreds: subPs, addHit: ah, subHit: sh, hit: ah || sh });
+      }
     }
   }
   return finalizeBonus(map);

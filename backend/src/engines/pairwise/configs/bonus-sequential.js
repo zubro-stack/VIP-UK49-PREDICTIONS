@@ -1,13 +1,20 @@
 const { findNextDayTargets, latestOfType } = require('../../core/draw-utils');
 const { isEquivalent, bonusDigitShiftTransform } = require('../../core/lottery-math');
-const { SEQUENTIAL_PAIRS } = require('./position-spaces');
+const { ALL_PAIRS_UNORDERED } = require('./position-spaces');
 
 /**
- * Bonus Sequential: same shape as V1 Sequential, but the prediction only
- * has to land on the *bonus ball* of the target draw (not anywhere in it),
- * and overflowing sums (> 49) are digit-shifted back into range instead of
- * discarded. Because bonus hits are rarer, one hit is enough to keep a
- * pattern alive (minHits: 1) instead of two.
+ * Bonus Sequential: same source-unit shape as V1 Sequential (single draw,
+ * next-day target), but the prediction only has to land on the *bonus
+ * ball* of the target draw (not anywhere in it), and overflowing sums
+ * (> 49) are digit-shifted back into range instead of discarded. Because
+ * bonus hits are rarer, one hit is enough to keep a pattern alive
+ * (minHits: 1) instead of two.
+ *
+ * Unlike V1 Sequential, this checks all 21 unordered position pairs
+ * (ALL_PAIRS_UNORDERED) rather than just the 6 sequential neighbour pairs -
+ * a combination like POS1+Bonus is a legitimate pair to test here even
+ * though it isn't "sequential", since any two positions can sum/diff into
+ * a bonus-ball prediction.
  */
 const bonusSequentialConfig = {
   code: 'bonus-seq',
@@ -26,7 +33,7 @@ const bonusSequentialConfig = {
     return units;
   },
 
-  positionPairs: () => SEQUENTIAL_PAIRS,
+  positionPairs: () => ALL_PAIRS_UNORDERED,
 
   matchTarget: (prediction, target) => isEquivalent(prediction, target.bonus),
 
