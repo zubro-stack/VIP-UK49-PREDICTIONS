@@ -208,8 +208,10 @@ function discoverBonusFam(draws) {
   for (const type of ['lunch', 'tea']) {
     const td = sorted.filter((d) => d.drawType === type);
     for (let k = 1; k < td.length; k++) {
-      const recent = td[k], prev = td[k - 1], next = td[k + 1];
-      if (!next) continue;
+      const recent = td[k], prev = td[k - 1];
+      if (!recent || !prev) continue;
+      const tgts = sorted.filter((d) => Math.round((new Date(d.drawDate) - new Date(recent.drawDate)) / 86400000) === 1);
+      if (!tgts.length) continue;
       const rN = recent.numbers.concat([recent.bonus]);
       const pN = prev.numbers.concat([prev.bonus]);
       for (const [ri, pi2] of SC.ALL) {
@@ -218,11 +220,11 @@ function discoverBonusFam(draws) {
         const sp = Math.abs(n1 - n2);
         const subPs = sp >= 1 ? [sp] : [];
         if (!addPs.length && !subPs.length) continue;
-        const ah = addPs.some((ap) => eqv(ap, next.bonus));
-        const sh = subPs.some((sp2) => eqv(sp2, next.bonus));
+        const ah = addPs.some((ap) => tgts.some((t) => eqv(ap, t.bonus)));
+        const sh = subPs.some((sp2) => tgts.some((t) => eqv(sp2, t.bonus)));
         const key = `bfam|${type}|${ri}|${pi2}`;
         if (!map.has(key)) map.set(key, { id: key, drawType: type, rp: ri, pp: pi2, history: [] });
-        map.get(key).history.push({ drawDate: recent.drawDate, nextDate: next.drawDate, rv: n1, pv: n2, addPreds: addPs, subPreds: subPs, addHit: ah, subHit: sh, hit: ah || sh });
+        map.get(key).history.push({ drawDate: recent.drawDate, nextDate: tgts[0].drawDate, rv: n1, pv: n2, addPreds: addPs, subPreds: subPs, addHit: ah, subHit: sh, hit: ah || sh });
       }
     }
   }
