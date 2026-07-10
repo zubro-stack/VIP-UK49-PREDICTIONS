@@ -48,9 +48,10 @@ function cardHit(config, card, targets) {
  *
  * A card whose real outcome isn't resolvable (no matching unit - e.g. the
  * Same Day engine anchoring on a Lunch draw whose Tea hasn't been entered
- * yet, or Bonus Family's stricter same-type adjacency at the very end of
- * the draw list) is excluded from that checkpoint's tally entirely rather
- * than counted as a guaranteed miss - otherwise every trailing checkpoint
+ * yet, or any engine's source draw sitting at the very end of the draw
+ * list with no next-day target recorded) is excluded from that
+ * checkpoint's tally entirely rather than counted as a guaranteed miss -
+ * otherwise every trailing checkpoint
  * (exactly the ones a user reviewing a backtest looks at first) would have
  * its hit rate artificially deflated by outcomes that simply aren't known
  * yet.
