@@ -85,6 +85,7 @@ export function Layout() {
             {ENGINE_PAGES.map((e) => (
               <NavItem key={e.path} to={`/engines/${e.path}`} icon={e.icon}>{e.label}</NavItem>
             ))}
+            <NavItem to="/engines/bonus-tracker" icon="🎱">Bonus Tracker</NavItem>
             <NavItem to="/engines/v3" icon="🔥">V3 Zubro Tracker</NavItem>
             <NavItem to="/repeats" icon="🔁">Repeats Tracker</NavItem>
           </NavSection>

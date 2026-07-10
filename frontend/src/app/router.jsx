@@ -6,6 +6,7 @@ import { Home } from '../pages/Home';
 import { Draws } from '../pages/Draws';
 import { EngineGroupPage } from '../pages/engines/EngineGroupPage';
 import { Repeats } from '../pages/Repeats';
+import { BonusTracker } from '../pages/BonusTracker';
 import { V3 } from '../pages/V3';
 import { Backtesting } from '../pages/Backtesting';
 import { BestPairs } from '../pages/BestPairs';
@@ -41,6 +42,7 @@ export const router = createBrowserRouter([
       },
       ...engineRoutes,
       { path: 'engines/v3', element: <V3 /> },
+      { path: 'engines/bonus-tracker', element: <BonusTracker /> },
       { path: 'repeats', element: <Repeats /> },
       { path: 'best-pairs', element: <BestPairs /> },
       { path: 'calc', element: <Calc /> },

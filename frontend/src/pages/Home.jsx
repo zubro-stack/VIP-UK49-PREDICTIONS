@@ -33,10 +33,35 @@ function DailyTripletCard() {
   );
 }
 
+const BONUS_SUB_CODES = ['bonus-seq', 'bonus-fam', 'bonus-v2'];
+
+/**
+ * Bonus Sequential/Family/V2 are three independently stored sub-engines,
+ * but the user only ever opens one "Bonus Tracker" page and runs one
+ * analysis - so the catalog's three bonus codes are collapsed into a
+ * single tile here, in the position the first one occupied.
+ */
+function collapseBonusTiles(catalog) {
+  const tiles = [];
+  let inserted = false;
+  catalog.forEach((e) => {
+    if (BONUS_SUB_CODES.includes(e.code)) {
+      if (!inserted) {
+        tiles.push({ code: 'bonus-tracker', label: 'Bonus Tracker', category: 'pairwise', implemented: true });
+        inserted = true;
+      }
+      return;
+    }
+    tiles.push(e);
+  });
+  return tiles;
+}
+
 export function Home() {
   const { user } = useAuth();
   const catalog = useEnginesStore((s) => s.catalog);
   const loadCatalog = useEnginesStore((s) => s.loadCatalog);
+  const tiles = collapseBonusTiles(catalog);
 
   useEffect(() => {
     loadCatalog();
@@ -52,7 +77,7 @@ export function Home() {
       <DailyTripletCard />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 'var(--sp-3)' }}>
-        {catalog.map((e) => (
+        {tiles.map((e) => (
           <Card key={e.code} interactive>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <div style={{ fontWeight: 700, fontSize: 13.5 }}>{e.label}</div>

@@ -13,6 +13,7 @@ export function PatternCard({ card, canManage, onMiss, onDelete }) {
     <Card interactive>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {card.subEngine && <Chip tone="warn">{card.subEngine.toUpperCase()}</Chip>}
           {card.drawType && <Chip>{card.drawType === 'lunch' ? 'Lunch' : 'Tea'}</Chip>}
           <span style={{ fontSize: 11, color: 'var(--t3)' }}>
             {POSITION_LABELS[card.positionA]} ↔ {POSITION_LABELS[card.positionB]}

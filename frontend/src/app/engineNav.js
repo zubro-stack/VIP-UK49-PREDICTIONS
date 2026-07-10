@@ -14,11 +14,14 @@ export const PAIRWISE_ENGINES = [
 ];
 
 /**
- * Sidebar/router page grouping - mirrors the legacy app's layout, where V1
- * (Sequential/Family tabs) and Bonus Tracker (Sequential/Family/V2 tabs) are
- * each a single page with internal tabs, not separate top-level pages. V2
- * and Lunchtime to Teatime are standalone pages in both the legacy app and
- * here, so they get a single-tab entry.
+ * Sidebar/router page grouping for the generic tabbed pairwise pages - V1
+ * (Sequential/Family tabs) bundles two algorithms behind one page/tab bar;
+ * V2 and Lunchtime to Teatime are standalone single-algorithm pages using
+ * the same tabbed-page component with a single tab. Bonus Tracker is NOT
+ * here: it's one page with a merged prediction feed and a single "Run
+ * Analysis" action across all three of its sub-engines, not a tab bar, so
+ * it gets its own dedicated component (see BonusTracker.jsx) the same way
+ * V3/Repeats/Best Pairs/Calc do.
  */
 export const ENGINE_PAGES = [
   {
@@ -32,16 +35,6 @@ export const ENGINE_PAGES = [
   },
   { path: 'v2', label: 'V2 Cross-Pattern', icon: '🔀', tabs: [{ code: 'v2', label: 'V2 Cross-Pattern' }] },
   { path: 'lunchtime-teatime', label: 'Lunchtime to Teatime', icon: '☀️', tabs: [{ code: 'same-day', label: 'Lunchtime to Teatime' }] },
-  {
-    path: 'bonus-tracker',
-    label: 'Bonus Tracker',
-    icon: '🎱',
-    tabs: [
-      { code: 'bonus-seq', label: 'Sequential' },
-      { code: 'bonus-fam', label: 'Family' },
-      { code: 'bonus-v2', label: 'V2' },
-    ],
-  },
 ];
 
 /** Every engine that supports backtesting - the 7 pairwise engines plus Repeats, V3 and Calc. */

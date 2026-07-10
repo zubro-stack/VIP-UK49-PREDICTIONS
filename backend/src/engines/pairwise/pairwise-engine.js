@@ -99,6 +99,15 @@ function discover(draws, config) {
   return finalizePatterns(map, { maxFail: config.maxFail ?? 2, minHits: config.minHits ?? 2 });
 }
 
+/** Shared card ordering: direct hits first, then last-hit, then streak/total. */
+function sortCards(cards) {
+  return cards.slice().sort((a, b) => {
+    if (a.hasDirectHit !== b.hasDirectHit) return a.hasDirectHit ? -1 : 1;
+    if (a.lastHit !== b.lastHit) return a.lastHit ? -1 : 1;
+    return b.streak - a.streak || b.totalHits - a.totalHits;
+  });
+}
+
 function buildCards(draws, patterns, config) {
   const sorted = sortDraws(draws);
   const sumTransform = config.sumTransform ?? identityTransform;
@@ -114,7 +123,7 @@ function buildCards(draws, patterns, config) {
   const recentDrawIds = new Set(sorted.slice(-maxDraws).map((d) => d.id));
   const hasRecentHit = (pattern) => pattern.history.some((h) => h.hit && recentDrawIds.has(h.sourceDrawId));
 
-  return patterns
+  const cards = patterns
     .filter((p) => p.status === 'active' && p.occurrences >= (config.minHits ?? 2) && hasRecentHit(p))
     .map((pattern) => {
       const current = config.currentSources(sorted, pattern);
@@ -145,13 +154,9 @@ function buildCards(draws, patterns, config) {
         lastHit,
         hasDirectHit,
       };
-    })
-    .filter((card) => card && card.streak >= minStreak)
-    .sort((a, b) => {
-      if (a.hasDirectHit !== b.hasDirectHit) return a.hasDirectHit ? -1 : 1;
-      if (a.lastHit !== b.lastHit) return a.lastHit ? -1 : 1;
-      return b.streak - a.streak || b.totalHits - a.totalHits;
     });
+
+  return sortCards(cards.filter((card) => card && card.streak >= minStreak));
 }
 
 function createPairwiseEngine(config) {
@@ -163,4 +168,4 @@ function createPairwiseEngine(config) {
   };
 }
 
-module.exports = { createPairwiseEngine };
+module.exports = { createPairwiseEngine, sortCards };

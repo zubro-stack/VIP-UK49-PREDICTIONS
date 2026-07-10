@@ -8,8 +8,10 @@ import { Button } from '../../components/ui/Button';
  * Renders one pairwise-engine's predictions - only the engine code and
  * label change, mirroring the backend's single generic engine. Used
  * directly for single-algorithm pages (V2, Lunchtime to Teatime) and
- * wrapped by EngineGroupPage for pages that bundle several algorithms
- * behind tabs (V1, Bonus Tracker).
+ * wrapped by EngineGroupPage for V1 (Sequential/Family tabs). Bonus
+ * Tracker does NOT use this component - it merges all three of its
+ * sub-engines into one feed instead of tabbing between them (see
+ * BonusTracker.jsx).
  */
 export function EnginePage({ code, label }) {
   const { cards, status, run, recordMiss, deletePattern } = useEngine(code);
