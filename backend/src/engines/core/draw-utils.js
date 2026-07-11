@@ -37,12 +37,23 @@ function latestTwoOfType(sortedDraws, drawType) {
   return typed.length >= 2 ? [typed[0], typed[1]] : null;
 }
 
-/** The most recent same-day Lunch+Tea pair, or null if either is missing. */
+/**
+ * The most recent same-day Lunch+Tea pair, or null if none exists yet.
+ * Searches day-by-day from the most recent, rather than independently
+ * taking the latest Lunch and the latest Tea - those can land on
+ * different days (e.g. today's Lunch is in but today's Tea hasn't been
+ * entered yet), which would silently pair two draws from different days
+ * under a "same day" contract.
+ */
 function latestLunchTeaPair(sortedDraws) {
-  const rev = sortedDraws.slice().reverse();
-  const lunch = rev.find((d) => d.drawType === 'lunch');
-  const tea = rev.find((d) => d.drawType === 'tea');
-  return lunch && tea ? { lunch, tea } : null;
+  const { dayMap, dayList } = groupByDay(sortedDraws);
+  for (let i = dayList.length - 1; i >= 0; i--) {
+    const dayDraws = dayMap.get(dayList[i]);
+    const lunch = dayDraws.find((d) => d.drawType === 'lunch');
+    const tea = dayDraws.find((d) => d.drawType === 'tea');
+    if (lunch && tea) return { lunch, tea };
+  }
+  return null;
 }
 
 /**
