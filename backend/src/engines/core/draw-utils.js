@@ -38,22 +38,19 @@ function latestTwoOfType(sortedDraws, drawType) {
 }
 
 /**
- * The most recent same-day Lunch+Tea pair, or null if none exists yet.
- * Searches day-by-day from the most recent, rather than independently
- * taking the latest Lunch and the latest Tea - those can land on
- * different days (e.g. today's Lunch is in but today's Tea hasn't been
- * entered yet), which would silently pair two draws from different days
- * under a "same day" contract.
+ * The latest Lunch draw and the latest Tea draw, found independently - NOT
+ * guaranteed to be from the same calendar day (e.g. if today's Lunch is in
+ * but today's Tea hasn't been entered yet, this pairs today's Lunch with
+ * yesterday's Tea). This matches the legacy engine's own live-card builder
+ * verbatim (`rev.find(lunch)` / `rev.find(tea)`, independently) - the
+ * historical discover() pass enforces strict same-day pairing via
+ * findSameDayTarget, but the live "current prediction" card intentionally
+ * does not.
  */
 function latestLunchTeaPair(sortedDraws) {
-  const { dayMap, dayList } = groupByDay(sortedDraws);
-  for (let i = dayList.length - 1; i >= 0; i--) {
-    const dayDraws = dayMap.get(dayList[i]);
-    const lunch = dayDraws.find((d) => d.drawType === 'lunch');
-    const tea = dayDraws.find((d) => d.drawType === 'tea');
-    if (lunch && tea) return { lunch, tea };
-  }
-  return null;
+  const lunch = latestOfType(sortedDraws, 'lunch');
+  const tea = latestOfType(sortedDraws, 'tea');
+  return lunch && tea ? { lunch, tea } : null;
 }
 
 /**
